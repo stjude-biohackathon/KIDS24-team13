@@ -27,7 +27,38 @@ You can install `napari-mock` via [pip]:
 
     pip install napari-mock
 
+## Pre-reqs for Developers
+ 
+### For GUI Designing:
 
+Install Qt Designer from [here]{https://build-system.fman.io/qt-designer-download} 
+
+### Create the conda environment using the requirments file
+
+We will use Python 3.10 as the python version
+
+```Shell
+conda create -n napari-env python=3.10
+```
+
+Activate the conda environment
+
+```Shell
+conda activate napari-env
+```
+
+Install the required packages using pip
+
+```Shell
+pip install -r requirements.txt
+```
+
+Open napari by typing the command
+```Shell
+napari
+```
+
+The plugin will be found in the **Plugins** menu as "Mock Widget"
 
 
 ## Contributing
