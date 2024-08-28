@@ -1,0 +1,5 @@
+LICENSE
+
+*.pyc
+*__pycache__
+*_tests
