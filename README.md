@@ -1,12 +1,4 @@
 # napari-mock
-
-[![License MIT](https://img.shields.io/pypi/l/napari-mock.svg?color=green)](https://github.com/githubuser/napari-mock/raw/main/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/napari-mock.svg?color=green)](https://pypi.org/project/napari-mock)
-[![Python Version](https://img.shields.io/pypi/pyversions/napari-mock.svg?color=green)](https://python.org)
-[![tests](https://github.com/githubuser/napari-mock/workflows/tests/badge.svg)](https://github.com/githubuser/napari-mock/actions)
-[![codecov](https://codecov.io/gh/githubuser/napari-mock/branch/main/graph/badge.svg)](https://codecov.io/gh/githubuser/napari-mock)
-[![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-mock)](https://napari-hub.org/plugins/napari-mock)
-
 mock
 
 ----------------------------------
@@ -20,12 +12,6 @@ https://github.com/napari/cookiecutter-napari-plugin#getting-started
 and review the napari docs for plugin developers:
 https://napari.org/stable/plugins/index.html
 -->
-
-## Installation
-
-You can install `napari-mock` via [pip]:
-
-    pip install napari-mock
 
 ## Pre-reqs for Developers
  
@@ -47,10 +33,10 @@ Activate the conda environment
 conda activate napari-env
 ```
 
-Install the required packages using pip
+Go into the downloaded folder and install the required packages using pip
 
 ```Shell
-pip install -r requirements.txt
+pip install -e .
 ```
 
 Open napari by typing the command
