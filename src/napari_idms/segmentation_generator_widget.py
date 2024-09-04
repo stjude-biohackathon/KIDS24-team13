@@ -1,11 +1,10 @@
-from qtpy.QtWidgets import QWidget, QComboBox, QVBoxLayout, QPushButton
+from qtpy.QtWidgets import QPushButton, QWidget, QComboBox, QLabel, QVBoxLayout
 import os
 from qtpy import uic
 from qtpy.QtCore import Qt
-import json
 
 class Segmentation_widget(QWidget):
-    def __init__(self, viewer):
+    def __init__(self, viewer, idms_api=None):
         # Initializing
         super().__init__()
         self.viewer = viewer
@@ -16,101 +15,92 @@ class Segmentation_widget(QWidget):
         abs_file_path = os.path.join(script_dir, '..', 'UI_files', ui_file_name)
         uic.loadUi(abs_file_path, self)
 
-        # Initialize label layers
-        self.label_layers = []
-        print(self.label_layers)
+        # Initialize old names for layers
+        self.oldnames = {}
 
-        # Checkable Multiple Selection
-        self.checkable_combo_box = CheckableComboBox(self.label_layers, self)
+        # Layout for the widget
         layout = QVBoxLayout(self)
-        layout.addWidget(self.checkable_combo_box)
 
-        # Find the Register button from the UI
+        # Checkable Multiple Selection ComboBox for layers
+        self.layerComboBox = CheckableComboBox([])
+        layout.addWidget(self.layerComboBox)
+
+        # Register button setup
         self.register_button = self.findChild(QPushButton, "registerButton")
         layout.addWidget(self.register_button)
-    
-        # Connect the Register button click event
+
+        # Connect button click to register function
         self.register_button.clicked.connect(self.on_register_clicked)
 
-        def update_layer_dropdown():
-            self.checkable_combo_box.update_items(self.label_layers)
+        # Connect to napari layer events
+        self.viewer.layers.events.inserted.connect(self.add_layer)
+        self.viewer.layers.events.removed.connect(self.remove_layer)
+        self.viewer.layers.events.changed.connect(self.on_namechange)
 
-        def on_new_label_layer(event):
-            label_name = getattr(event.value, 'name', str(event.value))
-            self.label_layers.append(label_name)
-            print("A new label layer was added:", label_name)
-            update_layer_dropdown()
+        # Initialize the UI with existing layers
+        for layer in self.viewer.layers:
+            self.add_layer_to_ui(layer)
 
-        def on_remove_label_layer(event):
-            label_name = getattr(event.value, 'name', str(event.value))
-            if label_name in self.label_layers:
-                self.label_layers.remove(label_name)
-            print("A label layer was removed:", label_name)
-            update_layer_dropdown()
+    def add_layer(self, event):
+        """Add a new layer to both combo box and checkboxes."""
+        new_layer = event.value
+        self.oldnames[new_layer] = new_layer.name
+        new_layer.events.name.connect(self.on_namechange)
+        self.add_layer_to_ui(new_layer)
 
-        def on_layer_renamed(event):
-            old_name = getattr(event.old_value, 'name', str(event.old_value))
-            new_name = getattr(event.value, 'name', str(event.value))
-            print(new_name)
-            if old_name in self.label_layers:
-                index = self.label_layers.index(old_name)
-                self.label_layers[index] = new_name
-                print(f"Layer renamed from {old_name} to {new_name}")
-                update_layer_dropdown()
+    def add_layer_to_ui(self, layer):
+        """Helper method to update the UI when a layer is added."""
+        self.layerComboBox.add_item(layer.name)
 
-        # Listen to the event of adding a new layer
-        viewer.layers.events.inserted.connect(on_new_label_layer)
-        viewer.layers.events.removed.connect(on_remove_label_layer)
-        viewer.layers.events.changed.connect(on_layer_renamed)
+    def remove_layer(self, event):
+        """Remove the layer from the combo box."""
+        removed_layer = event.value
+        del self.oldnames[removed_layer]
+        self.layerComboBox.remove_item(removed_layer.name)
 
-    
+    def on_namechange(self, event):
+        layer = event.source
+        oldname = self.oldnames[layer]
+        newname = layer.name
+        index = self.layerComboBox.findText(oldname)
+        # Update the old name with the new name
+        self.oldnames[layer] = newname
+        if index != -1:
+            self.layerComboBox.setItemText(index, newname)
+
     def on_register_clicked(self):
-        # Get the selected items from the CheckableComboBox
-        selected_items = self.checkable_combo_box.get_checked_items()
-        # Convert to JSON and print
-        json_output = json.dumps({"selected_layers": selected_items}, indent=4)
-        print(json_output)
+        selected_layers = self.layerComboBox.get_checked_items()
+        print(f"Registered layers: {selected_layers}")
 
 
 class CheckableComboBox(QComboBox):
     def __init__(self, items, parent=None):
         super(CheckableComboBox, self).__init__(parent)
-        self.items = items
-        self.initUI()
+        self.initUI(items)
 
-    def initUI(self):
+    def initUI(self, items):
+        self.items = items
+        self.setEditable(False)
         self.model().itemChanged.connect(self.on_item_changed)
-        self.populate_items(self.items)
-
-    # def populate_items(self, items):
-    #     self.clear()
-    #     for item in items:
-    #         self.addItem(item)
-    #         item_model = self.model().item(self.count() - 1)
-    #         item_model.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-    #         item_model.setCheckState(Qt.Unchecked)
-    def populate_items(self, items):
-        self.clear()
-        self.items = items
         for item in items:
-            self.addItem(item)
-            item_model = self.model().item(self.count() - 1)
-            item_model.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-            item_model.setCheckState(Qt.Unchecked)
+            self.add_item(item)
 
-    def update_items(self, new_items):
-        self.items = new_items
-        self.populate_items(self.items)
+    def add_item(self, item):
+        self.addItem(item)
+        item_model = self.model().item(self.count() - 1)
+        item_model.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+        item_model.setCheckState(Qt.Unchecked)
+
+    def remove_item(self, item):
+        index = self.findText(item)
+        if index >= 0:
+            self.removeItem(index)
 
     def on_item_changed(self):
-        checked_items = []
-        for i in range(self.count()):
-            if self.model().item(i).checkState() == Qt.Checked:
-                checked_items.append(self.model().item(i).text())
+        checked_items = self.get_checked_items()
         print("Checked items:", checked_items)
 
     def get_checked_items(self):
-        # Retrieve all checked items
         checked_items = []
         for i in range(self.count()):
             if self.model().item(i).checkState() == Qt.Checked:
