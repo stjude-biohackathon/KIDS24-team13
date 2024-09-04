@@ -1,5 +1,13 @@
-# napari-mock
-mock
+# napari-IDMS
+
+[![License MIT](https://img.shields.io/pypi/l/napari-IDMS.svg?color=green)](https://github.com/githubuser/napari-IDMS/raw/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/napari-IDMS.svg?color=green)](https://pypi.org/project/napari-IDMS)
+[![Python Version](https://img.shields.io/pypi/pyversions/napari-IDMS.svg?color=green)](https://python.org)
+[![tests](https://github.com/githubuser/napari-IDMS/workflows/tests/badge.svg)](https://github.com/githubuser/napari-IDMS/actions)
+[![codecov](https://codecov.io/gh/githubuser/napari-IDMS/branch/main/graph/badge.svg)](https://codecov.io/gh/githubuser/napari-IDMS)
+[![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-IDMS)](https://napari-hub.org/plugins/napari-IDMS)
+
+Plugin to access IDMS from napari
 
 ----------------------------------
 
@@ -13,31 +21,12 @@ and review the napari docs for plugin developers:
 https://napari.org/stable/plugins/index.html
 -->
 
-## Pre-reqs for Developers
- 
-### For GUI Designing:
+## Installation
 
-Install Qt Designer from [here]{https://build-system.fman.io/qt-designer-download} 
+You can install `napari-IDMS` via [pip]:
 
-### Create the conda environment using the requirments file
+    pip install napari-IDMS
 
-We will use Python 3.10 as the python version
-
-```Shell
-conda create -n napari-env python=3.10
-```
-
-Activate the conda environment
-
-```Shell
-conda activate napari-env
-```
-
-Go into the downloaded folder and install the required packages using pip
-
-```Shell
-pip install -e .
-```
 
 Install napari
 ```
@@ -49,7 +38,7 @@ Open napari by typing the command
 napari
 ```
 
-The plugin will be found in the **Plugins** menu as "Mock Widget"
+
 
 
 ## Contributing
@@ -60,7 +49,7 @@ the coverage at least stays the same before you submit a pull request.
 ## License
 
 Distributed under the terms of the [MIT] license,
-"napari-mock" is free and open source software
+"napari-IDMS" is free and open source software
 
 ## Issues
 
