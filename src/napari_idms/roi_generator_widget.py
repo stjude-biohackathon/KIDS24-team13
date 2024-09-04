@@ -70,7 +70,25 @@ class ROI_Generator_widget(QWidget):
             # If there are only two coordinates (x, y), set z to 0 by default
             if last_shape_int.shape[1] == 2:
                 last_shape_int = np.hstack([last_shape_int, np.zeros((last_shape_int.shape[0], 1), dtype=int)])
-            print("Coordinates of the drawn shape (x, y, z):", last_shape_int)
+
+            # Calculate the starting point (x, y, z)
+            start_point = last_shape_int[0]  # The first corner of the rectangle (x, y, z)
+            # Calculate width (w), height (h), and depth (d) based on the difference between first and opposite corner
+            opposite_point = last_shape_int[2]  # The opposite corner of the rectangle
+            w = opposite_point[1] - start_point[1]
+            h = opposite_point[0] - start_point[0]
+            d = 1 if self.viewer.dims.ndim == 2 else opposite_point[2] - start_point[2]
+
+            shape_info = {
+                "x": int(start_point[1]),
+                "y": int(start_point[0]),
+                "z": int(start_point[2]),
+                "w": int(w),
+                "h": int(h),
+                "d": int(d)
+            }
+            print(f"Shape info: {shape_info}")
+            return shape_info
 
     def create_roi(self, id):
 
