@@ -39,6 +39,11 @@ Go into the downloaded folder and install the required packages using pip
 pip install -e .
 ```
 
+Install napari
+```
+python -m pip install "napari[all]"
+```
+
 Open napari by typing the command
 ```Shell
 napari
