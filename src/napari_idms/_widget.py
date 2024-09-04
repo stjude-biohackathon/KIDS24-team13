@@ -24,6 +24,7 @@ class Main_Widget(QWidget):
 
         # Get the tab widget and add all our individual widgets there
         self.tab_widget = self.findChild(QTabWidget, "tab_widget")
+        # self.tab_widget.addTab(IDMS_main_widget(self.viewer), IDMS_Backend(), "IDMS main")
         self.tab_widget.addTab(IDMS_main_widget(self.viewer), "IDMS main")
         self.tab_widget.addTab(ROI_Generator_widget(self.viewer), "ROI Generator")
         self.tab_widget.addTab(Segmentation_widget(self.viewer), "Segmentation/Annotation")
