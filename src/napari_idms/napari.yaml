@@ -1,0 +1,15 @@
+name: napari-IDMS
+display_name: Image Data Management System
+# use 'hidden' to remove plugin from napari hub search results
+visibility: hidden
+# see https://napari.org/stable/plugins/manifest.html for valid categories
+categories: ["Annotation", "Segmentation", "Acquisition"]
+contributions:
+  commands:
+    - id: napari-IDMS.make_main_qwidget
+      python_name: napari_idms:Main_Widget
+      title: Make Main QWidget
+
+  widgets:
+    - command: napari-IDMS.make_main_qwidget
+      display_name: IDMS
