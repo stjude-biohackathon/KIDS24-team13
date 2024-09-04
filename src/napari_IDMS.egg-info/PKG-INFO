@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
-Name: napari-mock
+Name: napari-IDMS
 Version: 0.0.1
-Summary: mock
+Summary: Plugin to access IDMS from napari
 Author: CBI
 Author-email: yourname@example.com
 License: 
@@ -55,16 +55,16 @@ Requires-Dist: pytest-qt; extra == "testing"
 Requires-Dist: napari; extra == "testing"
 Requires-Dist: pyqt5; extra == "testing"
 
-# napari-mock
+# napari-IDMS
 
-[![License MIT](https://img.shields.io/pypi/l/napari-mock.svg?color=green)](https://github.com/githubuser/napari-mock/raw/main/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/napari-mock.svg?color=green)](https://pypi.org/project/napari-mock)
-[![Python Version](https://img.shields.io/pypi/pyversions/napari-mock.svg?color=green)](https://python.org)
-[![tests](https://github.com/githubuser/napari-mock/workflows/tests/badge.svg)](https://github.com/githubuser/napari-mock/actions)
-[![codecov](https://codecov.io/gh/githubuser/napari-mock/branch/main/graph/badge.svg)](https://codecov.io/gh/githubuser/napari-mock)
-[![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-mock)](https://napari-hub.org/plugins/napari-mock)
+[![License MIT](https://img.shields.io/pypi/l/napari-IDMS.svg?color=green)](https://github.com/githubuser/napari-IDMS/raw/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/napari-IDMS.svg?color=green)](https://pypi.org/project/napari-IDMS)
+[![Python Version](https://img.shields.io/pypi/pyversions/napari-IDMS.svg?color=green)](https://python.org)
+[![tests](https://github.com/githubuser/napari-IDMS/workflows/tests/badge.svg)](https://github.com/githubuser/napari-IDMS/actions)
+[![codecov](https://codecov.io/gh/githubuser/napari-IDMS/branch/main/graph/badge.svg)](https://codecov.io/gh/githubuser/napari-IDMS)
+[![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-IDMS)](https://napari-hub.org/plugins/napari-IDMS)
 
-mock
+Plugin to access IDMS from napari
 
 ----------------------------------
 
@@ -80,9 +80,9 @@ https://napari.org/stable/plugins/index.html
 
 ## Installation
 
-You can install `napari-mock` via [pip]:
+You can install `napari-IDMS` via [pip]:
 
-    pip install napari-mock
+    pip install napari-IDMS
 
 
 
@@ -95,7 +95,7 @@ the coverage at least stays the same before you submit a pull request.
 ## License
 
 Distributed under the terms of the [MIT] license,
-"napari-mock" is free and open source software
+"napari-IDMS" is free and open source software
 
 ## Issues
 

@@ -1,7 +1,7 @@
 [project]
-name = "napari-mock"
+name = "napari-IDMS"
 dynamic = ["version"]
-description = "mock"
+description = "Plugin to access IDMS from napari"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
@@ -42,7 +42,7 @@ testing = [
 ]
 
 [project.entry-points."napari.manifest"]
-napari-mock = "napari_mock:napari.yaml"
+napari-IDMS = "napari_idms:napari.yaml"
 
 
 
@@ -61,7 +61,7 @@ where = ["src"]
 
 
 [tool.setuptools.dynamic]
-version = {attr = "napari_mock.__init__.__version__"}
+version = {attr = "napari_idms.__init__.__version__"}
 
 [tool.black]
 line-length = 79
