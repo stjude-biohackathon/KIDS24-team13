@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>501</width>
-    <height>153</height>
+    <width>527</width>
+    <height>310</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,6 +50,35 @@
          </property>
          <property name="flat">
           <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="xoffset_lbl">
+         <property name="text">
+          <string>X Offset:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="yoffset_lbl">
+         <property name="text">
+          <string>Y Offset:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="zoffset_lbl">
+         <property name="text">
+          <string>Z Offset:</string>
          </property>
         </widget>
        </item>
