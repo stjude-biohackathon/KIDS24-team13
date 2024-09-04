@@ -85,6 +85,17 @@ You can install `napari-IDMS` via [pip]:
     pip install napari-IDMS
 
 
+Install napari
+```
+python -m pip install "napari[all]"
+```
+
+Open napari by typing the command
+```Shell
+napari
+```
+
+
 
 
 ## Contributing
