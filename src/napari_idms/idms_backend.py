@@ -15,7 +15,7 @@ class IDMS_Backend():
             self.idms_api = idms_api
         else:
             self.idms_api = IdmsAPI(endpoint='http://idms.stjude.org:8888/idms/api',
-                                    token='eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjbj1TaGFreWFcXCwgTmlzaGFudCxvdT1UT1Usb3U9RGVwYXJ0bWVudHMsb3U9U3lzdGVtVXNlcnMsZGM9c3RqdWRlLGRjPXNqY3JoLGRjPWxvY2FsIiwidXNlciI6Im5zaGFreWEiLCJpYXQiOjE3MjQ5NDg3MTgsImV4cCI6MTcyNTU1MzUxOH0.58_5HwsEltyxhz3Uz8ZJ1mODN9h0Q2153IYpS6ppwzo')
+                                    token='INSERT_TOKEN_HERE')
 
     def get_owners(self):
         owner = Owner(self.idms_api)
