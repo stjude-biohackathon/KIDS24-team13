@@ -1,0 +1,2 @@
+[napari.manifest]
+napari-IDMS = napari_idms:napari.yaml
