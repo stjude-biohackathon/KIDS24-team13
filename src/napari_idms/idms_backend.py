@@ -1,5 +1,6 @@
+import os
 import sys
-sys.path.append('/Volumes/ctrbioimageinformatics/common/BioHackathon/2024/pyidms/plugins')
+sys.path.append(os.getenv('PYIDMS_PLUGIN_LOCATION'))
 from common.group import Group
 from common.idms_api import IdmsAPI
 from common.image_collection import ImageCollection
@@ -14,8 +15,8 @@ class IDMS_Backend():
         if idms_api:
             self.idms_api = idms_api
         else:
-            self.idms_api = IdmsAPI(endpoint='http://idms.stjude.org:8888/idms/api',
-                                    token='INSERT_IDMS_API_TOKEN')
+            self.idms_api = IdmsAPI(endpoint=os.getenv('IDMS_API_ENDPOINT'),
+                                    token=os.getenv('IDMS_API_TOKEN'))
 
     def get_owners(self):
         owner = Owner(self.idms_api)
@@ -31,7 +32,9 @@ class IDMS_Backend():
 
     def get_image_collections(self, owner=None, project=None, group=None):
         image_collection = ImageCollection(self.idms_api)
-        return image_collection.search(owner=[owner], project=[project], group=[group], image_data_engine=['fileSystem'])
+        return [image_collections['imageCollection'] for image_collections in
+                image_collection.search(owner=[owner], project=[project], group=[group],
+                                        image_data_engine=['fileSystem'])]
 
     def get_image_collection_details(self, image_collection_id):
         image_collection = ImageCollection(self.idms_api)
@@ -66,8 +69,8 @@ if __name__ == '__main__':
     print(f"Projects: {idms.get_projects('biohackathon')}")
     print(f"Groups: {idms.get_groups('biohackathon', '2024')}")
     print(f"Image Collections: {idms.get_image_collections('biohackathon', '2024', 'Microglia_Samples')}")
-    print(f"Image Collection Details: {idms.get_image_collection_details('ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398')}")
-    print(f"Roi Boxes: {idms.get_roi_boxes('biohackathon', '2024', 'Microglia_Samples', 'B-T97L974C_s1' )}")
-    print(f"Roi Box Segmentations: {idms.get_roi_box_seg('biohackathon', '2024', 'Microglia_Samples', 'B-T97L974C_s1','box1' )}")
-
-
+    print(
+        f"Image Collection Details: {idms.get_image_collection_details('ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398')}")
+    print(f"Roi Boxes: {idms.get_roi_boxes('biohackathon', '2024', 'Microglia_Samples', 'B-T97L974C_s1')}")
+    print(
+        f"Roi Box Segmentations: {idms.get_roi_box_seg('biohackathon', '2024', 'Microglia_Samples', 'B-T97L974C_s1', 'box1')}")
