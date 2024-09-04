@@ -32,8 +32,9 @@ class IDMS_Backend():
 
     def get_image_collections(self, owner=None, project=None, group=None):
         image_collection = ImageCollection(self.idms_api)
-        return image_collection.search(owner=[owner], project=[project], group=[group],
-                                       image_data_engine=['fileSystem'])
+        return [image_collections['imageCollection'] for image_collections in
+                image_collection.search(owner=[owner], project=[project], group=[group],
+                                        image_data_engine=['fileSystem'])]
 
     def get_image_collection_details(self, image_collection_id):
         image_collection = ImageCollection(self.idms_api)

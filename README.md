@@ -38,6 +38,16 @@ Open napari by typing the command
 napari
 ```
 
+### Setup env variable for IDMS
+    
+```Shell
+conda env config vars set IDMS_API_ENDPOINT=''
+conda env config vars set PYIDMS_PLUGIN_LOCATION=''
+conda env config vars set IDMS_API_TOKEN=''
+
+conda deactivate 'env_name'
+conda activate 'env_name'
+```
 
 
 
