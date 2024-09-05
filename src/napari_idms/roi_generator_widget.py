@@ -8,7 +8,7 @@ import numpy as np
 
 
 class RoiListWidget(QWidget):
-    def __init__(self, header, roi_dict, parent=None):
+    def __init__(self, header, shape_info, parent=None):
         super().__init__(parent)
 
         # Load the UI file - Main window
@@ -27,12 +27,12 @@ class RoiListWidget(QWidget):
 
         self.roi_lbl.setText(header)
 
-        self.x_lbl.setText(str(roi_dict['x']))
-        self.y_lbl.setText(str(roi_dict['y']))
-        self.width_lbl.setText(str(roi_dict['width']))
-        self.height_lbl.setText(str(roi_dict['height']))
-        self.z_lbl.setText(str(roi_dict['z']))
-        self.depth_lbl.setText(str(roi_dict['depth']))
+        self.x_lbl.setText(str(shape_info['x']))
+        self.y_lbl.setText(str(shape_info['y']))
+        self.width_lbl.setText(str(shape_info['width']))
+        self.height_lbl.setText(str(shape_info['height']))
+        self.z_lbl.setText(str(shape_info['z']))
+        self.depth_lbl.setText(str(shape_info['depth']))
 
 
 class ROI_Generator_widget(QWidget):
@@ -41,6 +41,8 @@ class ROI_Generator_widget(QWidget):
         super().__init__()
         self.viewer = viewer
 
+        # Initialize shapes_dict as an instance attribute
+        self.shapes_dict = {}
 
         # Load the UI file - Main window
         script_dir = os.path.dirname(__file__)
@@ -50,13 +52,6 @@ class ROI_Generator_widget(QWidget):
 
         # Create a QListWidget
         self.list_widget = self.findChild(QListWidget, "roi_lw")
-
-        dict1 = {'x': 10, 'y': 20, 'width': 30, 'height': 40, 'z': 50, 'depth': 60}
-        dict2 = {'x': 100, 'y': 200, 'width': 300, 'height': 400, 'z': 500, 'depth': 600}
-
-        # Add some custom widgets to the QListWidget
-        self.create_roi(1, dict1)
-        self.create_roi(2, dict2)
 
         # Start from here for the dynamic UI elements
 
@@ -77,20 +72,20 @@ class ROI_Generator_widget(QWidget):
             print("New shapes layer added by the user.")
     
     def on_shape_drawn(self, event):
-    # Callback function to print coordinates when a new shape is drawn.
+        # Only focus on the most recently drawn shape
         if len(self.shapes_layer.data) > 0:
-            # Get the last added shape coordinates
-            last_shape = self.shapes_layer.data[-1]
-            last_shape_int = last_shape.astype(int)
+            # Get the last shape drawn
+            shape = self.shapes_layer.data[-1]
+            shape_int = shape.astype(int)
 
             # If there are only two coordinates (x, y), set z to 0 by default
-            if last_shape_int.shape[1] == 2:
-                last_shape_int = np.hstack([last_shape_int, np.zeros((last_shape_int.shape[0], 1), dtype=int)])
+            if shape_int.shape[1] == 2:
+                shape_int = np.hstack([shape_int, np.zeros((shape_int.shape[0], 1), dtype=int)])
 
             # Calculate the starting point (x, y, z)
-            start_point = last_shape_int[0]  # The first corner of the rectangle (x, y, z)
+            start_point = shape_int[0]  # The first corner of the rectangle (x, y, z)
             # Calculate width (w), height (h), and depth (d) based on the difference between first and opposite corner
-            opposite_point = last_shape_int[2]  # The opposite corner of the rectangle
+            opposite_point = shape_int[2]  # The opposite corner of the rectangle
             w = opposite_point[1] - start_point[1]
             h = opposite_point[0] - start_point[0]
             d = 1 if self.viewer.dims.ndim == 2 else opposite_point[2] - start_point[2]
@@ -99,27 +94,36 @@ class ROI_Generator_widget(QWidget):
                 "x": int(start_point[1]),
                 "y": int(start_point[0]),
                 "z": int(start_point[2]),
-                "w": int(w),
-                "h": int(h),
-                "d": int(d)
+                "width": int(w),
+                "height": int(h),
+                "depth": int(d)
             }
-            print(f"Shape info: {shape_info}")
-            return shape_info
 
-    def create_roi(self, id, roi_dict):
+            # Create the ROI for the last drawn shape
+            shape_id = len(self.shapes_layer.data)
+            print(f"Shape {shape_id}: {shape_info}")
+            self.shapes_dict[f'Shape {shape_id}'] = shape_info
+
+            # Pass the last shape info to create_roi
+            self.create_roi(shape_id, shape_info)
+
+            return shape_info, self.shapes_dict
+        return self.shapes_dict
+
+    def create_roi(self, id, shape_info) -> RoiListWidget:
 
         # Create the custom widget
-        custom_widget = RoiListWidget(str(id), roi_dict)
+        custom_widget = RoiListWidget(f'ROI {str(id)}', shape_info)
 
         # Wrap the custom widget in a QListWidgetItem
         list_item = QListWidgetItem()
         list_item.setSizeHint(custom_widget.sizeHint())
 
-        
-
         # Add the widget to the QListWidget
         self.list_widget.addItem(list_item)
         self.list_widget.setItemWidget(list_item, custom_widget)
+
+        return custom_widget
    
     def register_with_IDMS(self,):
         print("Executing this statement ! ")
