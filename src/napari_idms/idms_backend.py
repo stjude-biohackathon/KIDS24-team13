@@ -10,6 +10,7 @@ from common.project import Project
 from common.roi_box_data import RoiBoxData
 from common.roi_box_image import RoiBoxImage
 from common.roi_box_seg_data import RoiBoxSegData
+from common.roi_box_seg_image import RoiBoxSegImage
 
 
 class IDMS_Backend():
@@ -73,6 +74,10 @@ class IDMS_Backend():
         roi_box_image = RoiBoxImage(self.idms_api)
         return roi_box_image.image_array_from_box_id(box_id, scale=1)
 
+    def get_array_from_seg_id(self, seg_id):
+        roi_box_seg_image = RoiBoxSegImage(self.idms_api)
+        return roi_box_seg_image.image_array(seg_id, scale=1)
+
     def get_array_from_box_coordinate(self, x, y, z, sizeX, sizeY, sizeZ, image_collection_id):
         roi_box_image = RoiBoxImage(self.idms_api)
         return roi_box_image.image_array(image_collection_id, x, y, z, sizeX, sizeY, sizeZ, scale=1)
@@ -95,3 +100,5 @@ if __name__ == '__main__':
         f"Roi Box Shape from coordinate: {idms.get_array_from_box_coordinate(0, 0, 0, 100, 100, 40, 'ic_3422e23815a4e23815a442aac842ffffffff1725372234235').shape}")
     print(
         f"Roi Box Segmentations: {idms.get_roi_box_seg('biohackathon', '2024', 'Microglia_Samples', 'Lu-T39ExB_s1', ['roiB_404960411aab191b838be93'])}")
+    print(
+        f"Roi Box Segmentation Shape: {idms.get_array_from_seg_id('seg_43ae601151919fe50301').shape}")
