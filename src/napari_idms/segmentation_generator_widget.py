@@ -8,6 +8,8 @@ class Segmentation_widget(QWidget):
         # Initializing
         super().__init__()
         self.viewer = viewer
+        
+        self.idms_api = idms_api
 
         # Load the UI file - Main window
         script_dir = os.path.dirname(__file__)
@@ -39,7 +41,11 @@ class Segmentation_widget(QWidget):
 
         # Initialize the UI with existing layers
         for layer in self.viewer.layers:
+            # self.add_layer_to_ui(layer)
+            self.oldnames[layer] = layer.name
+            layer.events.name.connect(self.on_namechange)
             self.add_layer_to_ui(layer)
+
 
     def add_layer(self, event):
         """Add a new layer to both combo box and checkboxes."""
@@ -67,11 +73,51 @@ class Segmentation_widget(QWidget):
         self.oldnames[layer] = newname
         if index != -1:
             self.layerComboBox.setItemText(index, newname)
-
+    
     def on_register_clicked(self):
         selected_layers = self.layerComboBox.get_checked_items()
         print(f"Registered layers: {selected_layers}")
 
+        # Save each selected layer
+        for layer_name in selected_layers:
+            # Find the layer in the viewer by name
+            layer = self.viewer.layers[layer_name]
+
+            # Check if the layer has data (such as an image or labels layer)
+            if hasattr(layer, 'data'):
+                data = layer.data
+                shape = data.shape
+
+                #adding some prints to debug
+                print(f"Layer '{layer_name}' data as NumPy array:")
+                print(layer.data)
+                print(type(layer.data))
+                print(layer.data.shape)
+                print("Number of axes:", layer.data.ndim) 
+                # Determine the file path and save the data
+                out = "/Volumes/ctrbioimageinformatics/common/BioHackathon/2024/segmentation_data/"
+                file_name = f"{layer_name}.tiff"
+                save_path = out + file_name
+                
+                # Save the layer as a TIFF file
+                layer.save(save_path)
+
+                #send to IDMS
+                #send save_path, roi-id
+                jude_path = "/research/sharedresources/cbi/common/BioHackathon/2024/segmentation_data/" + file_name
+                #get this roi id from previous tab
+                roi_id = 12894747
+
+                if self.idms_api:
+                    response = self.idms_api.create_roi_box_seg(roi_id, jude_path)
+                    print(response)
+                else:
+                    print("failed to send to IDMS")
+
+
+                print(f"Layer '{layer_name}' saved to {save_path}")
+            else:
+                print(f"Layer '{layer_name}' does not have accessible data as a NumPy array.")
 
 class CheckableComboBox(QComboBox):
     def __init__(self, items, parent=None):
