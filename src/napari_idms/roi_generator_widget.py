@@ -200,7 +200,11 @@ class ROI_Generator_widget(QWidget):
 
             # Pass the last shape info to create_roi
             widget_id= self.create_roi(shape_id, shape_info)
+
+            # Map the shape_id to the widget_id
             self.shape_widget_map[shape_id] = widget_id
+
+            print("Shapes Widget Map:", self.shape_widget_map)
 
             return shape_info, self.shapes_dict
         return self.shapes_dict
