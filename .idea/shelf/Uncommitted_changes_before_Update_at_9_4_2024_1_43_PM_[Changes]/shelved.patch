@@ -1,0 +1,150 @@
+Index: src/napari_IDMS.egg-info/PKG-INFO
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Metadata-Version: 2.1\r\nName: napari-IDMS\r\nVersion: 0.0.1\r\nSummary: Plugin to access IDMS from napari\r\nAuthor: CBI\r\nAuthor-email: yourname@example.com\r\nLicense: \r\n        The MIT License (MIT)\r\n        \r\n        Copyright (c) 2024 CBI\r\n        \r\n        Permission is hereby granted, free of charge, to any person obtaining a copy\r\n        of this software and associated documentation files (the \"Software\"), to deal\r\n        in the Software without restriction, including without limitation the rights\r\n        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\r\n        copies of the Software, and to permit persons to whom the Software is\r\n        furnished to do so, subject to the following conditions:\r\n        \r\n        The above copyright notice and this permission notice shall be included in\r\n        all copies or substantial portions of the Software.\r\n        \r\n        THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\r\n        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\r\n        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\r\n        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\r\n        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\r\n        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\r\n        THE SOFTWARE.\r\n        \r\nClassifier: Development Status :: 2 - Pre-Alpha\r\nClassifier: Framework :: napari\r\nClassifier: Intended Audience :: Developers\r\nClassifier: License :: OSI Approved :: MIT License\r\nClassifier: Operating System :: OS Independent\r\nClassifier: Programming Language :: Python\r\nClassifier: Programming Language :: Python :: 3\r\nClassifier: Programming Language :: Python :: 3 :: Only\r\nClassifier: Programming Language :: Python :: 3.9\r\nClassifier: Programming Language :: Python :: 3.10\r\nClassifier: Programming Language :: Python :: 3.11\r\nClassifier: Programming Language :: Python :: 3.12\r\nClassifier: Topic :: Scientific/Engineering :: Image Processing\r\nRequires-Python: >=3.9\r\nDescription-Content-Type: text/markdown\r\nLicense-File: LICENSE\r\nRequires-Dist: numpy\r\nRequires-Dist: magicgui\r\nRequires-Dist: qtpy\r\nRequires-Dist: scikit-image\r\nProvides-Extra: testing\r\nRequires-Dist: tox; extra == \"testing\"\r\nRequires-Dist: pytest; extra == \"testing\"\r\nRequires-Dist: pytest-cov; extra == \"testing\"\r\nRequires-Dist: pytest-qt; extra == \"testing\"\r\nRequires-Dist: napari; extra == \"testing\"\r\nRequires-Dist: pyqt5; extra == \"testing\"\r\n\r\n# napari-IDMS\r\n\r\n[![License MIT](https://img.shields.io/pypi/l/napari-IDMS.svg?color=green)](https://github.com/githubuser/napari-IDMS/raw/main/LICENSE)\r\n[![PyPI](https://img.shields.io/pypi/v/napari-IDMS.svg?color=green)](https://pypi.org/project/napari-IDMS)\r\n[![Python Version](https://img.shields.io/pypi/pyversions/napari-IDMS.svg?color=green)](https://python.org)\r\n[![tests](https://github.com/githubuser/napari-IDMS/workflows/tests/badge.svg)](https://github.com/githubuser/napari-IDMS/actions)\r\n[![codecov](https://codecov.io/gh/githubuser/napari-IDMS/branch/main/graph/badge.svg)](https://codecov.io/gh/githubuser/napari-IDMS)\r\n[![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-IDMS)](https://napari-hub.org/plugins/napari-IDMS)\r\n\r\nPlugin to access IDMS from napari\r\n\r\n----------------------------------\r\n\r\nThis [napari] plugin was generated with [Cookiecutter] using [@napari]'s [cookiecutter-napari-plugin] template.\r\n\r\n<!--\r\nDon't miss the full getting started guide to set up your new package:\r\nhttps://github.com/napari/cookiecutter-napari-plugin#getting-started\r\n\r\nand review the napari docs for plugin developers:\r\nhttps://napari.org/stable/plugins/index.html\r\n-->\r\n\r\n## Installation\r\n\r\nYou can install `napari-IDMS` via [pip]:\r\n\r\n    pip install napari-IDMS\r\n\r\n\r\n\r\n\r\n## Contributing\r\n\r\nContributions are very welcome. Tests can be run with [tox], please ensure\r\nthe coverage at least stays the same before you submit a pull request.\r\n\r\n## License\r\n\r\nDistributed under the terms of the [MIT] license,\r\n\"napari-IDMS\" is free and open source software\r\n\r\n## Issues\r\n\r\nIf you encounter any problems, please [file an issue] along with a detailed description.\r\n\r\n[napari]: https://github.com/napari/napari\r\n[Cookiecutter]: https://github.com/audreyr/cookiecutter\r\n[@napari]: https://github.com/napari\r\n[MIT]: http://opensource.org/licenses/MIT\r\n[BSD-3]: http://opensource.org/licenses/BSD-3-Clause\r\n[GNU GPL v3.0]: http://www.gnu.org/licenses/gpl-3.0.txt\r\n[GNU LGPL v3.0]: http://www.gnu.org/licenses/lgpl-3.0.txt\r\n[Apache Software License 2.0]: http://www.apache.org/licenses/LICENSE-2.0\r\n[Mozilla Public License 2.0]: https://www.mozilla.org/media/MPL/2.0/index.txt\r\n[cookiecutter-napari-plugin]: https://github.com/napari/cookiecutter-napari-plugin\r\n\r\n[napari]: https://github.com/napari/napari\r\n[tox]: https://tox.readthedocs.io/en/latest/\r\n[pip]: https://pypi.org/project/pip/\r\n[PyPI]: https://pypi.org/\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/napari_IDMS.egg-info/PKG-INFO b/src/napari_IDMS.egg-info/PKG-INFO
+--- a/src/napari_IDMS.egg-info/PKG-INFO	(revision 7bb3563d494cd9bc4844173504af89b02dc355be)
++++ b/src/napari_IDMS.egg-info/PKG-INFO	(date 1725464800045)
+@@ -85,6 +85,17 @@
+     pip install napari-IDMS
+ 
+ 
++Install napari
++```
++python -m pip install "napari[all]"
++```
++
++Open napari by typing the command
++```Shell
++napari
++```
++
++
+ 
+ 
+ ## Contributing
+Index: src/napari_idms/IDMS_main_widget.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from qtpy.QtWidgets import QHBoxLayout, QPushButton, QWidget, QComboBox, QLabel, QWidget, QVBoxLayout, QListWidget\r\nimport os\r\nfrom qtpy import uic\r\nfrom qtpy.QtCore import Qt\r\nimport sys\r\n\r\nclass IDMS_main_widget(QWidget):\r\n    def __init__(self, viewer):\r\n        # Initializing\r\n        super().__init__()\r\n        self.viewer = viewer\r\n        self.items = [\"Item1\",\"Item2\",\"Item3\"]\r\n\r\n\r\n        # Load the UI file - Main window\r\n        script_dir = os.path.dirname(__file__)\r\n        ui_file_name = \"mock_IDMS_main.ui\"\r\n        abs_file_path = os.path.join(script_dir, '..', 'UI_files', ui_file_name)\r\n        uic.loadUi(abs_file_path, self)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/napari_idms/IDMS_main_widget.py b/src/napari_idms/IDMS_main_widget.py
+--- a/src/napari_idms/IDMS_main_widget.py	(revision 7bb3563d494cd9bc4844173504af89b02dc355be)
++++ b/src/napari_idms/IDMS_main_widget.py	(date 1725475264535)
+@@ -3,17 +3,70 @@
+ from qtpy import uic
+ from qtpy.QtCore import Qt
+ import sys
++from .checkable_combobox import CheckableComboBox
+ 
++# IDMS Main class
+ class IDMS_main_widget(QWidget):
+-    def __init__(self, viewer):
++    def __init__(self, viewer,idms_api=None,stand_alone=True):
+         # Initializing
+         super().__init__()
+         self.viewer = viewer
+         self.items = ["Item1","Item2","Item3"]
+ 
+-
+         # Load the UI file - Main window
+         script_dir = os.path.dirname(__file__)
+-        ui_file_name = "mock_IDMS_main.ui"
++        ui_file_name = "IDMS_main.ui"
+         abs_file_path = os.path.join(script_dir, '..', 'UI_files', ui_file_name)
+-        uic.loadUi(abs_file_path, self)
+\ No newline at end of file
++        uic.loadUi(abs_file_path, self)
++
++        # Get the dropdown boxes from ui file
++        self.owner_cbbox = self.findChild(QComboBox, "owner_cbbox")
++        self.project_cbbox = self.findChild(QComboBox, "project_cbbox")
++        self.group_cbbox = self.findChild(QComboBox, "group_cbbox")
++        self.ic_cbbox = self.findChild(QComboBox, "ic_cbbox")
++        self.roi_cbbox = self.findChild(QComboBox, "roi_cbbox")
++        self.seg_cbbox = self.findChild(QComboBox, "seg_cbbox")
++
++        # Get the layout boxes to add
++        self.roi_hbox = self.findChild(QHBoxLayout, "roi_hbox")
++        self.seg_hbox = self.findChild(QHBoxLayout, "seg_hbox")
++
++
++        # Add initial items to combobox inside the hboxes
++        self.roi_cbbox =  CheckableComboBox(self.items)
++        self.roi_hbox.addWidget(self.roi_cbbox)
++
++        self.seg_cbbox =  CheckableComboBox(self.items)
++        self.seg_hbox.addWidget(self.seg_cbbox)
++
++        # Trigger IDMS and populate one by one
++        self.IDMS_initialize()
++        self.IDMS_populate_interface()
++
++
++    # Function to add list of items to the combo box
++    def populate_combobox(self,combo_box,items):
++        combo_box.clear()  # Clear existing items
++        combo_box.addItems(items)  # Add new items from the list
++
++    # Function to Initialize IDMS
++    def IDMS_initialize(self):
++        print("Initializing IDMS")
++
++
++    # Function to populate initial items from IDMS
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
+Index: src/napari_IDMS.egg-info/SOURCES.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>LICENSE\r\nMANIFEST.in\r\nREADME.md\r\npyproject.toml\r\nsrc/napari_IDMS.egg-info/PKG-INFO\r\nsrc/napari_IDMS.egg-info/SOURCES.txt\r\nsrc/napari_IDMS.egg-info/dependency_links.txt\r\nsrc/napari_IDMS.egg-info/entry_points.txt\r\nsrc/napari_IDMS.egg-info/requires.txt\r\nsrc/napari_IDMS.egg-info/top_level.txt\r\nsrc/napari_idms/IDMS_main_widget.py\r\nsrc/napari_idms/__init__.py\r\nsrc/napari_idms/_widget.py\r\nsrc/napari_idms/_writer.py\r\nsrc/napari_idms/napari.yaml\r\nsrc/napari_idms/roi_generator_widget.py\r\nsrc/napari_idms/segmentation_generator_widget.py\r\nsrc/napari_idms/_tests/__init__.py\r\nsrc/napari_idms/_tests/test_widget.py\r\nsrc/napari_idms/_tests/test_writer.py
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/napari_IDMS.egg-info/SOURCES.txt b/src/napari_IDMS.egg-info/SOURCES.txt
+--- a/src/napari_IDMS.egg-info/SOURCES.txt	(revision 7bb3563d494cd9bc4844173504af89b02dc355be)
++++ b/src/napari_IDMS.egg-info/SOURCES.txt	(date 1725464800061)
+@@ -11,6 +11,7 @@
+ src/napari_idms/IDMS_main_widget.py
+ src/napari_idms/__init__.py
+ src/napari_idms/_widget.py
++src/napari_idms/_widget_backup.py
+ src/napari_idms/_writer.py
+ src/napari_idms/napari.yaml
+ src/napari_idms/roi_generator_widget.py
+Index: src/napari_idms/_widget.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from typing import TYPE_CHECKING\r\n\r\nfrom qtpy.QtWidgets import QWidget, QTabWidget\r\nimport os\r\nfrom qtpy import uic\r\nfrom .IDMS_main_widget import IDMS_main_widget\r\nfrom .roi_generator_widget import ROI_Generator_widget\r\nfrom .segmentation_generator_widget import Segmentation_widget\r\n\r\nif TYPE_CHECKING:\r\n    import napari\r\n\r\nclass Main_Widget(QWidget):\r\n    def __init__(self, viewer: \"napari.viewer.Viewer\"):\r\n        # Initializing\r\n        super().__init__()\r\n        self.viewer = viewer\r\n\r\n        # Load the UI file - Main window - just the panel\r\n        script_dir = os.path.dirname(__file__)\r\n        ui_file_name = \"Main_UI.ui\"\r\n        abs_file_path = os.path.join(script_dir, '..', 'UI_files', ui_file_name)\r\n        uic.loadUi(abs_file_path, self)\r\n\r\n        # Get the tab widget and add all our individual widgets there\r\n        self.tab_widget = self.findChild(QTabWidget, \"tab_widget\")\r\n        self.tab_widget.addTab(IDMS_main_widget(self.viewer), \"IDMS main\")\r\n        self.tab_widget.addTab(ROI_Generator_widget(self.viewer), \"ROI Generator\")\r\n        self.tab_widget.addTab(Segmentation_widget(self.viewer), \"Segmentation/Annotation\")
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/napari_idms/_widget.py b/src/napari_idms/_widget.py
+--- a/src/napari_idms/_widget.py	(revision 7bb3563d494cd9bc4844173504af89b02dc355be)
++++ b/src/napari_idms/_widget.py	(date 1725465771174)
+@@ -26,4 +26,5 @@
+         self.tab_widget = self.findChild(QTabWidget, "tab_widget")
+         self.tab_widget.addTab(IDMS_main_widget(self.viewer), "IDMS main")
+         self.tab_widget.addTab(ROI_Generator_widget(self.viewer), "ROI Generator")
+-        self.tab_widget.addTab(Segmentation_widget(self.viewer), "Segmentation/Annotation")
+\ No newline at end of file
++        self.tab_widget.addTab(Segmentation_widget(self.viewer), "Segmentation/Annotation")
++

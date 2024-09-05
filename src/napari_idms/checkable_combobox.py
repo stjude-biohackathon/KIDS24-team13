@@ -30,6 +30,7 @@ class CheckableComboBox3(QComboBox):
         self.checked_items = []
         self.initUI()
 
+
     def initUI(self):
         self.setEditable(True)  # Make the combo box editable to display checked items at the top
         self.lineEdit().setReadOnly(True)  # Prevent manual editing of the checked items display

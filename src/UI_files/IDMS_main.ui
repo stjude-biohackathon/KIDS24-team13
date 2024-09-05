@@ -151,7 +151,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="loadn_main_btn">
+      <widget class="QPushButton" name="load_main_btn">
        <property name="text">
         <string>Load Images/ROis</string>
        </property>
@@ -175,7 +175,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="advanced_settings_btn">
        <property name="text">
         <string>Advanced Settings</string>
        </property>
@@ -211,7 +211,26 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="meta_ls"/>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>530</width>
+        <height>350</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QListWidget" name="meta_ls"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
   </layout>
  </widget>
