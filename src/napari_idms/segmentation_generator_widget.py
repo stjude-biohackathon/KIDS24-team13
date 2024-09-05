@@ -1,4 +1,4 @@
-from qtpy.QtWidgets import QPushButton, QWidget, QComboBox, QLabel, QVBoxLayout
+from qtpy.QtWidgets import QPushButton,QHBoxLayout, QWidget, QComboBox, QLabel, QVBoxLayout, QMessageBox
 import os
 from qtpy import uic
 from qtpy.QtCore import Qt
@@ -23,9 +23,30 @@ class Segmentation_widget(QWidget):
         # Layout for the widget
         layout = QVBoxLayout(self)
 
-        # Checkable Multiple Selection ComboBox for layers
+        layout.setSpacing(10)
+        layout.setContentsMargins(10, 10, 10, 10)
+        
+        #segmentation section
+        seg_layout = QHBoxLayout()
+        self.label = QLabel('Segmentation')
+        seg_layout.addWidget(self.label)
+        
         self.layerComboBox = CheckableComboBox([])
-        layout.addWidget(self.layerComboBox)
+        seg_layout.addWidget(self.layerComboBox)
+        layout.addLayout(seg_layout)
+
+        # ROIs section
+        roi_layout = QHBoxLayout()
+    
+        self.label = QLabel('ROIs')
+        roi_layout.addWidget(self.label)
+
+        self.roiComboBox = QComboBox()
+        items = ['a', 'b', 'c', 'd']
+        self.roiComboBox.addItems(items)
+        roi_layout.addWidget(self.roiComboBox)
+
+        layout.addLayout(roi_layout)
 
         # Register button setup
         self.register_button = self.findChild(QPushButton, "registerButton")
