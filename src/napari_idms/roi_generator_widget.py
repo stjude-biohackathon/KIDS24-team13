@@ -4,22 +4,7 @@ from qtpy import uic
 from qtpy.QtCore import Qt
 from qtpy.uic import loadUiType
 import sys
-
-# Load the .ui file
-# Ui_CustomWidget, _ = loadUiType("custom_widget.ui")
-
-
-# class CustomWidget(QWidget):
-#     def __init__(self, text, parent=None):
-#         super().__init__(parent)
-
-#         # Create a label to show the text
-#         self.label = QLabel(text)
-        
-#         # Set up the layout and add the label
-#         layout = QVBoxLayout()
-#         layout.addWidget(self.label)
-#         self.setLayout(layout)
+import numpy as np
 
 
 class RoiListWidget(QWidget):
@@ -50,8 +35,6 @@ class ROI_Generator_widget(QWidget):
         abs_file_path = os.path.join(script_dir, '..', 'UI_files', ui_file_name)
         uic.loadUi(abs_file_path, self)
 
-        # Creating the scrollbar for widget list
-        # self.scroll = self.findChild(QListWidget, "roi_lw")
         # Create a QListWidget
         self.list_widget = self.findChild(QListWidget, "roi_lw")
 
@@ -68,10 +51,6 @@ class ROI_Generator_widget(QWidget):
         self.viewer.layers.events.inserted.connect(self.on_layer_added)
 
 
-        # New code to handle shape layer and printing coordinates
-        # self.shapes_layer = self.viewer.add_shapes()  # Create or access a shapes layer in napari
-        # self.shapes_layer.events.data.connect(self.on_shape_drawn)  # Connect event when a new shape is drawn
-
     def on_layer_added(self, event):
         """Check if a new shapes layer has been added."""
         layer = event.value
@@ -86,9 +65,30 @@ class ROI_Generator_widget(QWidget):
         if len(self.shapes_layer.data) > 0:
             # Get the last added shape coordinates
             last_shape = self.shapes_layer.data[-1]
-            print("Coordinates of the drawn shape:", last_shape)
-        else:
-            print("No shape is drawn yet.")
+            last_shape_int = last_shape.astype(int)
+
+            # If there are only two coordinates (x, y), set z to 0 by default
+            if last_shape_int.shape[1] == 2:
+                last_shape_int = np.hstack([last_shape_int, np.zeros((last_shape_int.shape[0], 1), dtype=int)])
+
+            # Calculate the starting point (x, y, z)
+            start_point = last_shape_int[0]  # The first corner of the rectangle (x, y, z)
+            # Calculate width (w), height (h), and depth (d) based on the difference between first and opposite corner
+            opposite_point = last_shape_int[2]  # The opposite corner of the rectangle
+            w = opposite_point[1] - start_point[1]
+            h = opposite_point[0] - start_point[0]
+            d = 1 if self.viewer.dims.ndim == 2 else opposite_point[2] - start_point[2]
+
+            shape_info = {
+                "x": int(start_point[1]),
+                "y": int(start_point[0]),
+                "z": int(start_point[2]),
+                "w": int(w),
+                "h": int(h),
+                "d": int(d)
+            }
+            print(f"Shape info: {shape_info}")
+            return shape_info
 
     def create_roi(self, id):
 
