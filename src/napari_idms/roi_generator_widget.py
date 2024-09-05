@@ -40,7 +40,7 @@ def show_critical_messagebox(message):
 
 
 class RoiListWidget(QWidget):
-    def __init__(self, header, roi_dict, idms_api, parent=None):
+    def __init__(self, header, roi_dict, idms_api, parent=None, remove_callback=None):
         super().__init__(parent)
 
         # Load the UI file - Main window
@@ -50,6 +50,7 @@ class RoiListWidget(QWidget):
         uic.loadUi(abs_file_path, self)
 
         self.roi_lbl = self.findChild(QLabel, "roi_lbl")
+        self.remove_btn = self.findChild(QPushButton, "remove_btn")
         self.x_dsb = self.findChild(QDoubleSpinBox, "x_dsb")
         self.y_dsb = self.findChild(QDoubleSpinBox, "y_dsb")
         self.width_dsb = self.findChild(QDoubleSpinBox, "width_dsb")
@@ -59,22 +60,13 @@ class RoiListWidget(QWidget):
 
         self.roi_lbl.setText(header)
 
-        self.x_dsb.setValue(roi_dict['x'])
-        self.y_dsb.setValue(roi_dict['y'])
-        self.width_dsb.setValue(roi_dict['width'])
-        self.height_dsb.setValue(roi_dict['height'])
-        self.z_dsb.setValue(roi_dict['z'])
-        self.depth_dsb.setValue(roi_dict['depth'])
-        
-        ic_details = idms_api.get_image_collection_details('ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398')
+        self.remove_callback = remove_callback  # Store the remove callback function
 
-        # print(ic_details[0]['bounds'])
-        # print(ic_details[0]['bounds']['maxX'])
-        # Setting the spinner limits
+
+        ic_details = idms_api.get_image_collection_details('ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398')
         y_max = int(ic_details[0]['bounds']['maxY'])
         x_max = int(ic_details[0]['bounds']['maxX'])
         z_max = int(ic_details[0]['bounds']['maxZ'])
-
 
         #Has to be dynamically changed?
         width_max = int(ic_details[0]['bounds']['maxX'])
@@ -87,6 +79,20 @@ class RoiListWidget(QWidget):
         self.height_dsb.setMaximum(height_max)
         self.z_dsb.setMaximum(z_max)
         self.depth_dsb.setMaximum(depth_max)
+
+        self.x_dsb.setValue(roi_dict['x'])
+        self.y_dsb.setValue(roi_dict['y'])
+        self.width_dsb.setValue(roi_dict['width'])
+        self.height_dsb.setValue(roi_dict['height'])
+        self.z_dsb.setValue(roi_dict['z'])
+        self.depth_dsb.setValue(roi_dict['depth'])
+
+        # Connect the remove button to the remove function
+        self.remove_btn.clicked.connect(self.remove_item)
+
+    def remove_item(self):
+        if self.remove_callback:
+            self.remove_callback(self)  # Call the parent widget's remove function with this widget
 
     def get_x(self):
         return int(self.x_dsb.value())
@@ -126,7 +132,7 @@ class RoiListWidget(QWidget):
 
 
 class ROI_Generator_widget(QWidget):
-    def __init__(self, viewer, idms_api=None):
+    def __init__(self, viewer, idms_api=None, idms_main= None):
         # Initializing
         super().__init__()
         self.viewer = viewer
@@ -135,6 +141,7 @@ class ROI_Generator_widget(QWidget):
         # Initialize shapes_dict as an instance attribute
         self.shapes_dict = {}
         self.shape_widget_map = {}
+        self.widget_list_map = {}
 
         # Load the UI file - Main window
         script_dir = os.path.dirname(__file__)
@@ -167,7 +174,7 @@ class ROI_Generator_widget(QWidget):
     
     def on_shape_drawn(self, event):
         # Only focus on the most recently drawn shape
-        if len(self.shapes_layer.data) > 0:
+        if event.action == "added":
             # Get the last shape drawn
             shape = self.shapes_layer.data[-1]
             shape_int = shape.astype(int)
@@ -207,22 +214,81 @@ class ROI_Generator_widget(QWidget):
             print("Shapes Widget Map:", self.shape_widget_map)
 
             return shape_info, self.shapes_dict
+
+        # if len(self.shapes_layer.data) > 0:
+        #     # Get the last shape drawn
+        #     shape = self.shapes_layer.data[-1]
+        #     shape_int = shape.astype(int)
+
+        #     # If there are only two coordinates (x, y), set z to 0 by default
+        #     if shape_int.shape[1] == 2:
+        #         shape_int = np.hstack([shape_int, np.zeros((shape_int.shape[0], 1), dtype=int)])
+
+        #     # Calculate the starting point (x, y, z)
+        #     start_point = shape_int[0]  # The first corner of the rectangle (x, y, z)
+        #     # Calculate width (w), height (h), and depth (d) based on the difference between first and opposite corner
+        #     opposite_point = shape_int[2]  # The opposite corner of the rectangle
+        #     w = opposite_point[1] - start_point[1]
+        #     h = opposite_point[0] - start_point[0]
+        #     d = 1 if self.viewer.dims.ndim == 2 else opposite_point[2] - start_point[2]
+
+        #     shape_info = {
+        #         "x": int(start_point[1]),
+        #         "y": int(start_point[0]),
+        #         "z": int(start_point[2]),
+        #         "width": int(w),
+        #         "height": int(h),
+        #         "depth": int(d)
+        #     }
+
+        #     # Create the ROI for the last drawn shape
+        #     shape_id = len(self.shapes_layer.data)
+        #     print(f"Shape {shape_id}: {shape_info}")
+        #     self.shapes_dict[f'Shape {shape_id}'] = shape_info
+
+        #     # Pass the last shape info to create_roi
+        #     widget_id= self.create_roi(shape_id, shape_info)
+
+        #     # Map the shape_id to the widget_id
+        #     self.shape_widget_map[shape_id] = widget_id
+
+        #     print("Shapes Widget Map:", self.shape_widget_map)
+
+        #     return shape_info, self.shapes_dict
         return self.shapes_dict
 
     def create_roi(self, id, shape_info) -> RoiListWidget:
 
         # Create the custom widget
-        custom_widget = RoiListWidget(str(id), shape_info, self.idms_api)
+        custom_widget = RoiListWidget(str(id), shape_info, self.idms_api, remove_callback=self.remove_roi_item)
 
         # Wrap the custom widget in a QListWidgetItem
         list_item = QListWidgetItem()
         list_item.setSizeHint(custom_widget.sizeHint())
+        
 
         # Add the widget to the QListWidget
         self.list_widget.addItem(list_item)
         self.list_widget.setItemWidget(list_item, custom_widget)
 
+        self.widget_list_map[custom_widget] = list_item
+
         return custom_widget
+    
+    def remove_roi_item(self, widget):
+        """Remove the widget from the QListWidget and delete it."""
+        list_item = self.widget_list_map[widget]  # Get the QListWidgetItem associated with the widget
+        row = self.list_widget.row(list_item)  # Get the row of the list item
+        self.list_widget.takeItem(row)  # Remove the item from the QListWidget
+        widget.deleteLater()  # Delete the widget from memory
+
+        # Optionally remove the corresponding shape from the dictionary
+        shape_id = int(widget.roi_lbl.text())
+        if shape_id in self.shape_widget_map:
+            del self.shape_widget_map[shape_id]
+            del self.shapes_dict[f'Shape {shape_id}']
+
+        print(f"Removed shape {shape_id}. Current shapes:", self.shapes_dict)
 
     def register_with_IDMS(self, image_collection_id, idms_api=None):
 
