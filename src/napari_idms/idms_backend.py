@@ -68,23 +68,56 @@ class IDMS_Backend():
 
     def get_array_from_image_collection_id(self, image_collection_id):
         image_collection = ImageCollection(self.idms_api)
-        return image_collection.image(image_collection_id, scale=1)
+
+        first_channel = IDMS_Backend.transpose(image_collection.image(image_collection_id, scale=1))
+        channel_stack = first_channel
+        if first_channel.ndim == 4:
+            num_channels = first_channel.shape[0]
+            for i in range(num_channels - 1):
+                channel_stack[i + 1] = \
+                IDMS_Backend.transpose(image_collection.image(image_collection_id, scale=1, channel=i + 1))[0]
+        return channel_stack
+
+    # TODO: Handle for all dimensions
+    @staticmethod
+    def transpose(image):
+        if image.ndim == 4:
+            return image.transpose(1, 0, 2, 3)
+        return image
 
     def get_array_from_box_id(self, box_id):
         roi_box_image = RoiBoxImage(self.idms_api)
-        return roi_box_image.image_array_from_box_id(box_id, scale=1)
+
+        first_channel = IDMS_Backend.transpose(roi_box_image.image_array_from_box_id(box_id, scale=1))
+        channel_stack = first_channel
+        if first_channel.ndim == 4:
+            num_channels = first_channel.shape[0]
+            for i in range(num_channels - 1):
+                channel_stack[i + 1] = \
+                IDMS_Backend.transpose(roi_box_image.image_array_from_box_id(box_id, scale=1, channel=i + 1))[0]
+        return channel_stack
 
     def get_array_from_seg_id(self, seg_id):
         roi_box_seg_image = RoiBoxSegImage(self.idms_api)
-        return roi_box_seg_image.image_array(seg_id, scale=1)
+        return self.transpose(roi_box_seg_image.image_array(seg_id, scale=1))
 
     def get_array_from_box_coordinate(self, x, y, z, sizeX, sizeY, sizeZ, image_collection_id):
         roi_box_image = RoiBoxImage(self.idms_api)
-        return roi_box_image.image_array(image_collection_id, x, y, z, sizeX, sizeY, sizeZ, scale=1)
+        first_channel = IDMS_Backend.transpose(
+            roi_box_image.image_array(image_collection_id, x, y, z, sizeX, sizeY, sizeZ, scale=1))
+        channel_stack = first_channel
+        if first_channel.ndim == 4:
+            num_channels = first_channel.shape[0]
+            for i in range(num_channels - 1):
+                channel_stack[i + 1] = IDMS_Backend.transpose(
+                    roi_box_image.image_array(image_collection_id, x, y, z, sizeX, sizeY, sizeZ, scale=1,
+                                              channel=i + 1))[0]
+        return channel_stack
 
 
 if __name__ == '__main__':
     idms = IDMS_Backend()
+    print(idms)
     print(f'Owners: {idms.get_owners()}')
     print(f"Projects: {idms.get_projects('biohackathon')}")
     print(f"Groups: {idms.get_groups('biohackathon', '2024')}")
@@ -94,7 +127,7 @@ if __name__ == '__main__':
     print(f"Roi Boxes: {idms.get_roi_boxes('biohackathon', '2024', 'Microglia_Samples', 'Lu-T39ExB_s1')}")
     # print(idms.create_roi_box_seg('roiB_404960411aab191b838be93', '/research/sharedresources/cbi/common/BioHackathon/2024/segmentation_data/roiB_4044760262a1919f9bf7ef.ome.tiff'))
     print(
-        f"Image Collection Shape: {idms.get_array_from_image_collection_id('ic_3422e23815a4e23815a442aac842ffffffff1725372234235')}")
+        f"Image Collection Shape: {idms.get_array_from_image_collection_id('ic_3422e23815a4e23815a442aac842ffffffff1725372234235').shape}")
     print(f"Roi Box Shape: {idms.get_array_from_box_id('roiB_404960411aab191b838be93').shape}")
     print(
         f"Roi Box Shape from coordinate: {idms.get_array_from_box_coordinate(0, 0, 0, 100, 100, 40, 'ic_3422e23815a4e23815a442aac842ffffffff1725372234235').shape}")
@@ -102,3 +135,11 @@ if __name__ == '__main__':
         f"Roi Box Segmentations: {idms.get_roi_box_seg('biohackathon', '2024', 'Microglia_Samples', 'Lu-T39ExB_s1', ['roiB_404960411aab191b838be93'])}")
     print(
         f"Roi Box Segmentation Shape: {idms.get_array_from_seg_id('seg_43ae601151919fe50301').shape}")
+
+    print(f"Image Collections: {idms.get_image_collections('biohackathon', '2024', 'Puncta_imgs_2channels')}")
+    print(
+        f"Image Collection Puncta_imgs_2channels Shape: {idms.get_array_from_image_collection_id('ic_3432b7b1eec5b7b1eec531d92c4dffffffff1725374112149').shape}")
+
+    print(f"Image Collections: {idms.get_image_collections('biohackathon', '2024', 'Puncta_imgs_3channels')}")
+    print(
+        f"Image Collection  Puncta_imgs_3channels Shape: {idms.get_array_from_image_collection_id('ic_344291440bfa91440bfa2960fb24ffffffff1725460401436').shape}")
