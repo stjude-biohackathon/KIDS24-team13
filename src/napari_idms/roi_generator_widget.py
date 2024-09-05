@@ -40,7 +40,7 @@ def show_critical_messagebox(message):
 
 
 class RoiListWidget(QWidget):
-    def __init__(self, header, shape_info, idms_api, parent=None):
+    def __init__(self, header, roi_dict, idms_api, parent=None):
         super().__init__(parent)
 
         # Load the UI file - Main window
@@ -59,12 +59,70 @@ class RoiListWidget(QWidget):
 
         self.roi_lbl.setText(header)
 
-        self.x_lbl.setText(str(shape_info['x']))
-        self.y_lbl.setText(str(shape_info['y']))
-        self.width_lbl.setText(str(shape_info['width']))
-        self.height_lbl.setText(str(shape_info['height']))
-        self.z_lbl.setText(str(shape_info['z']))
-        self.depth_lbl.setText(str(shape_info['depth']))
+        self.x_dsb.setValue(roi_dict['x'])
+        self.y_dsb.setValue(roi_dict['y'])
+        self.width_dsb.setValue(roi_dict['width'])
+        self.height_dsb.setValue(roi_dict['height'])
+        self.z_dsb.setValue(roi_dict['z'])
+        self.depth_dsb.setValue(roi_dict['depth'])
+        
+        ic_details = idms_api.get_image_collection_details('ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398')
+
+        # print(ic_details[0]['bounds'])
+        # print(ic_details[0]['bounds']['maxX'])
+        # Setting the spinner limits
+        y_max = int(ic_details[0]['bounds']['maxY'])
+        x_max = int(ic_details[0]['bounds']['maxX'])
+        z_max = int(ic_details[0]['bounds']['maxZ'])
+
+
+        #Has to be dynamically changed?
+        width_max = int(ic_details[0]['bounds']['maxX'])
+        height_max = int(ic_details[0]['bounds']['maxY'])
+        depth_max = int(ic_details[0]['bounds']['maxZ'])
+
+        self.x_dsb.setMaximum(x_max)
+        self.y_dsb.setMaximum(y_max)
+        self.width_dsb.setMaximum(width_max)
+        self.height_dsb.setMaximum(height_max)
+        self.z_dsb.setMaximum(z_max)
+        self.depth_dsb.setMaximum(depth_max)
+
+    def get_x(self):
+        return int(self.x_dsb.value())
+    
+    def get_y(self):
+        return int(self.y_dsb.value())
+    
+    def get_width(self):
+        return int(self.width_dsb.value())
+    
+    def get_height(self):
+        return int(self.height_dsb.value())
+    
+    def get_z(self):
+        return int(self.z_dsb.value())
+    
+    def get_depth(self):
+        return int(self.depth_dsb.value())
+    
+    def set_x(self, x):
+        self.x_dsb.setValue(x)
+
+    def set_y(self, y):
+        self.y_dsb.setValue(y)
+
+    def set_width(self, width):
+        self.width_dsb.setValue(width)
+
+    def set_height(self, height):
+        self.height_dsb.setValue(height)
+    
+    def set_z(self, z):
+        self.z_dsb.setValue(z)
+
+    def set_depth(self, depth):
+        self.depth_dsb.setValue(depth)
 
 
 class ROI_Generator_widget(QWidget):
@@ -76,6 +134,7 @@ class ROI_Generator_widget(QWidget):
         self.widget_list1 = None
         # Initialize shapes_dict as an instance attribute
         self.shapes_dict = {}
+        self.shape_widget_map = {}
 
         # Load the UI file - Main window
         script_dir = os.path.dirname(__file__)
@@ -140,7 +199,8 @@ class ROI_Generator_widget(QWidget):
             self.shapes_dict[f'Shape {shape_id}'] = shape_info
 
             # Pass the last shape info to create_roi
-            self.create_roi(shape_id, shape_info)
+            widget_id= self.create_roi(shape_id, shape_info)
+            self.shape_widget_map[shape_id] = widget_id
 
             return shape_info, self.shapes_dict
         return self.shapes_dict
@@ -148,7 +208,7 @@ class ROI_Generator_widget(QWidget):
     def create_roi(self, id, shape_info) -> RoiListWidget:
 
         # Create the custom widget
-        custom_widget = RoiListWidget(str(id), roi_dict, self.idms_api)
+        custom_widget = RoiListWidget(str(id), shape_info, self.idms_api)
 
         # Wrap the custom widget in a QListWidgetItem
         list_item = QListWidgetItem()
@@ -163,6 +223,7 @@ class ROI_Generator_widget(QWidget):
     def register_with_IDMS(self, image_collection_id, idms_api=None):
 
         idms_api = self.idms_api
+        self.widget_list1 = self.shape_widget_map[1]
         
         if not idms_api:
             show_critical_messagebox("IDMS API not found!")
