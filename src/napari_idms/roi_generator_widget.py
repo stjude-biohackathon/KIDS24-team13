@@ -1,14 +1,46 @@
-from qtpy.QtWidgets import QHBoxLayout, QPushButton, QWidget, QComboBox, QLabel, QWidget, QVBoxLayout, QListWidget, QListView, QListWidgetItem, QLabel, QVBoxLayout, QLineEdit
+from qtpy.QtWidgets import QHBoxLayout, QPushButton, QWidget, QComboBox, QLabel, QWidget, QVBoxLayout, QListWidget, QListView, QListWidgetItem, QLabel
+from qtpy.QtWidgets import QMessageBox, QDoubleSpinBox
 import os
 from qtpy import uic
-from qtpy.QtCore import Qt
-from qtpy.uic import loadUiType
 import sys
 import numpy as np
 
 
+def show_info_messagebox(message): 
+    msg = QMessageBox() 
+    msg.setIcon(QMessageBox.Information) 
+
+    # setting message for Message Box 
+    msg.setText(message) 
+    
+    # setting Message box window title 
+    msg.setWindowTitle("Info") 
+    
+    # declaring buttons on Message Box 
+    msg.setStandardButtons(QMessageBox.Ok) 
+    
+    # start the app 
+    retval = msg.exec_() 
+
+def show_critical_messagebox(message): 
+    msg = QMessageBox() 
+    msg.setIcon(QMessageBox.Critical) 
+
+    # setting message for Message Box 
+    msg.setText(message) 
+    
+    # setting Message box window title 
+    msg.setWindowTitle("Error") 
+    
+    # declaring buttons on Message Box 
+    msg.setStandardButtons(QMessageBox.Ok) 
+    
+    # start the app 
+    retval = msg.exec_() 
+
+
 class RoiListWidget(QWidget):
-    def __init__(self, header, shape_info, parent=None):
+    def __init__(self, header, shape_info, idms_api, parent=None):
         super().__init__(parent)
 
         # Load the UI file - Main window
@@ -18,12 +50,12 @@ class RoiListWidget(QWidget):
         uic.loadUi(abs_file_path, self)
 
         self.roi_lbl = self.findChild(QLabel, "roi_lbl")
-        self.x_lbl = self.findChild(QLineEdit, "x_ledit")
-        self.y_lbl = self.findChild(QLineEdit, "y_ledit")
-        self.width_lbl = self.findChild(QLineEdit, "width_ledit")
-        self.height_lbl = self.findChild(QLineEdit, "height_ledit")
-        self.z_lbl = self.findChild(QLineEdit, "z_ledit")
-        self.depth_lbl = self.findChild(QLineEdit, "depth_ledit")
+        self.x_dsb = self.findChild(QDoubleSpinBox, "x_dsb")
+        self.y_dsb = self.findChild(QDoubleSpinBox, "y_dsb")
+        self.width_dsb = self.findChild(QDoubleSpinBox, "width_dsb")
+        self.height_dsb = self.findChild(QDoubleSpinBox, "height_dsb")
+        self.z_dsb = self.findChild(QDoubleSpinBox, "z_dsb")
+        self.depth_dsb = self.findChild(QDoubleSpinBox, "depth_dsb")
 
         self.roi_lbl.setText(header)
 
@@ -40,7 +72,8 @@ class ROI_Generator_widget(QWidget):
         # Initializing
         super().__init__()
         self.viewer = viewer
-
+        self.idms_api = idms_api
+        self.widget_list1 = None
         # Initialize shapes_dict as an instance attribute
         self.shapes_dict = {}
 
@@ -56,10 +89,12 @@ class ROI_Generator_widget(QWidget):
         # Start from here for the dynamic UI elements
 
         # Example usage
-        self.example_btn = self.findChild(QPushButton, "register_btn")
-        self.example_btn.clicked.connect(self.register_with_IDMS)
+        self.idms_register_btn = self.findChild(QPushButton, "register_btn")
+        self.idms_register_btn.clicked.connect(self.register_with_IDMS)
 
         self.viewer.layers.events.inserted.connect(self.on_layer_added)
+
+        # Registering with IDMS
 
 
     def on_layer_added(self, event):
@@ -113,7 +148,7 @@ class ROI_Generator_widget(QWidget):
     def create_roi(self, id, shape_info) -> RoiListWidget:
 
         # Create the custom widget
-        custom_widget = RoiListWidget(f'ROI {str(id)}', shape_info)
+        custom_widget = RoiListWidget(str(id), roi_dict, self.idms_api)
 
         # Wrap the custom widget in a QListWidgetItem
         list_item = QListWidgetItem()
@@ -124,7 +159,45 @@ class ROI_Generator_widget(QWidget):
         self.list_widget.setItemWidget(list_item, custom_widget)
 
         return custom_widget
-   
-    def register_with_IDMS(self,):
-        print("Executing this statement ! ")
+
+    def register_with_IDMS(self, image_collection_id, idms_api=None):
+
+        idms_api = self.idms_api
+        
+        if not idms_api:
+            show_critical_messagebox("IDMS API not found!")
+
+            return
+
+        image_collection_id = 'ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398'
+
+        # Add check for z dimension
+        try:
+
+            box_id = idms_api.create_roi_box(self.widget_list1.get_x(),
+                                    self.widget_list1.get_y(),
+                                    self.widget_list1.get_z(),
+                                        self.widget_list1.get_width(),
+                                        self.widget_list1.get_height(),
+                                            self.widget_list1.get_depth(),
+                                            image_collection_id)
+            
+            # print("Box Id:", box_id)
+            if box_id:
+                show_info_messagebox("Roi registered with IDMS!")
+            else:
+                raise Exception
+
+        except Exception as e:
+            show_critical_messagebox(f"Roi was not registered with IDMS!: \n{e}")
+        
+
+
+        
+
+        
+
+
+
+        
 
