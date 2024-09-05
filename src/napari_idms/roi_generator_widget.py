@@ -8,7 +8,7 @@ import numpy as np
 
 
 class RoiListWidget(QWidget):
-    def __init__(self, text, parent=None):
+    def __init__(self, header, roi_dict, parent=None):
         super().__init__(parent)
 
         # Load the UI file - Main window
@@ -18,12 +18,25 @@ class RoiListWidget(QWidget):
         uic.loadUi(abs_file_path, self)
 
         self.roi_lbl = self.findChild(QLabel, "roi_lbl")
+        self.x_lbl = self.findChild(QLineEdit, "x_ledit")
+        self.y_lbl = self.findChild(QLineEdit, "y_ledit")
+        self.width_lbl = self.findChild(QLineEdit, "width_ledit")
+        self.height_lbl = self.findChild(QLineEdit, "height_ledit")
+        self.z_lbl = self.findChild(QLineEdit, "z_ledit")
+        self.depth_lbl = self.findChild(QLineEdit, "depth_ledit")
 
-        self.roi_lbl.setText(text)
+        self.roi_lbl.setText(header)
+
+        self.x_lbl.setText(str(roi_dict['x']))
+        self.y_lbl.setText(str(roi_dict['y']))
+        self.width_lbl.setText(str(roi_dict['width']))
+        self.height_lbl.setText(str(roi_dict['height']))
+        self.z_lbl.setText(str(roi_dict['z']))
+        self.depth_lbl.setText(str(roi_dict['depth']))
 
 
 class ROI_Generator_widget(QWidget):
-    def __init__(self, viewer):
+    def __init__(self, viewer, idms_api=None):
         # Initializing
         super().__init__()
         self.viewer = viewer
@@ -38,9 +51,12 @@ class ROI_Generator_widget(QWidget):
         # Create a QListWidget
         self.list_widget = self.findChild(QListWidget, "roi_lw")
 
+        dict1 = {'x': 10, 'y': 20, 'width': 30, 'height': 40, 'z': 50, 'depth': 60}
+        dict2 = {'x': 100, 'y': 200, 'width': 300, 'height': 400, 'z': 500, 'depth': 600}
+
         # Add some custom widgets to the QListWidget
-        for i in range(5):
-            self.create_roi(i)
+        self.create_roi(1, dict1)
+        self.create_roi(2, dict2)
 
         # Start from here for the dynamic UI elements
 
@@ -90,19 +106,21 @@ class ROI_Generator_widget(QWidget):
             print(f"Shape info: {shape_info}")
             return shape_info
 
-    def create_roi(self, id):
+    def create_roi(self, id, roi_dict):
 
         # Create the custom widget
-        custom_widget = RoiListWidget(str(id))
+        custom_widget = RoiListWidget(str(id), roi_dict)
 
         # Wrap the custom widget in a QListWidgetItem
         list_item = QListWidgetItem()
         list_item.setSizeHint(custom_widget.sizeHint())
 
+        
+
         # Add the widget to the QListWidget
         self.list_widget.addItem(list_item)
         self.list_widget.setItemWidget(list_item, custom_widget)
    
-    def register_with_IDMS(self):
+    def register_with_IDMS(self,):
         print("Executing this statement ! ")
 

@@ -6,7 +6,7 @@ from qtpy import uic
 from .IDMS_main_widget import IDMS_main_widget
 from .roi_generator_widget import ROI_Generator_widget
 from .segmentation_generator_widget import Segmentation_widget
-
+from .idms_backend import IDMS_Backend
 if TYPE_CHECKING:
     import napari
 
@@ -26,5 +26,5 @@ class Main_Widget(QWidget):
         self.tab_widget = self.findChild(QTabWidget, "tab_widget")
         # self.tab_widget.addTab(IDMS_main_widget(self.viewer), IDMS_Backend(), "IDMS main")
         self.tab_widget.addTab(IDMS_main_widget(self.viewer), "IDMS main")
-        self.tab_widget.addTab(ROI_Generator_widget(self.viewer), "ROI Generator")
+        self.tab_widget.addTab(ROI_Generator_widget(self.viewer, IDMS_Backend()), "ROI Generator")
         self.tab_widget.addTab(Segmentation_widget(self.viewer), "Segmentation/Annotation")
