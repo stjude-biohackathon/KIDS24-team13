@@ -4,12 +4,13 @@ from qtpy import uic
 from qtpy.QtCore import Qt
 
 class Segmentation_widget(QWidget):
-    def __init__(self, viewer, idms_api=None):
+    def __init__(self, viewer, idms_api=None, idms_main=None):
         # Initializing
         super().__init__()
         self.viewer = viewer
         
         self.idms_api = idms_api
+        self.idms_main = idms_main
 
         # Load the UI file - Main window
         script_dir = os.path.dirname(__file__)
@@ -35,15 +36,17 @@ class Segmentation_widget(QWidget):
         seg_layout.addWidget(self.layerComboBox)
         layout.addLayout(seg_layout)
 
-        # ROIs section
+        
+        #print(self.idms_main.roi_cbbox.checked_items)
+        #print(self.roi_items)
+        self.roi_items = set()
         roi_layout = QHBoxLayout()
     
         self.label = QLabel('ROIs')
         roi_layout.addWidget(self.label)
 
         self.roiComboBox = QComboBox()
-        items = ['a', 'b', 'c', 'd']
-        self.roiComboBox.addItems(items)
+        #self.roiComboBox.addItems(roi_items)
         roi_layout.addWidget(self.roiComboBox)
 
         layout.addLayout(roi_layout)
@@ -61,16 +64,25 @@ class Segmentation_widget(QWidget):
         self.viewer.layers.events.changed.connect(self.on_namechange)
 
         # Initialize the UI with existing layers
-        for layer in self.viewer.layers:
-            # self.add_layer_to_ui(layer)
-            self.oldnames[layer] = layer.name
-            layer.events.name.connect(self.on_namechange)
-            self.add_layer_to_ui(layer)
+        # for layer in self.viewer.layers:
+        #     # self.add_layer_to_ui(layer)
+        #     self.oldnames[layer] = layer.name
+        #     layer.events.name.connect(se////lf.on_namechange)
+        #     self.add_layer_to_ui(layer)/
 
 
     def add_layer(self, event):
         """Add a new layer to both combo box and checkboxes."""
+        # ROIs section
+        roi_items = self.idms_main.roi_cbbox.checked_items
+        for roi in roi_items:
+            if roi not in self.roi_items:
+                self.roi_items.add(roi)
+                self.roiComboBox.addItem(roi)
         new_layer = event.value
+        if new_layer.name in roi_items:
+            return
+        
         self.oldnames[new_layer] = new_layer.name
         new_layer.events.name.connect(self.on_namechange)
         self.add_layer_to_ui(new_layer)
