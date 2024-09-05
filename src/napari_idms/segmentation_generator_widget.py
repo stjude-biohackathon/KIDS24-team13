@@ -127,7 +127,7 @@ class Segmentation_widget(QWidget):
                 #send save_path, roi-id
                 jude_path = "/research/sharedresources/cbi/common/BioHackathon/2024/segmentation_data/" + file_name
                 #get this roi id from previous tab
-                roi_id = 12894747
+                roi_id = "roiB_404555ff39fe191c31a89cf"
 
                 if self.idms_api:
                     response = self.idms_api.create_roi_box_seg(roi_id, jude_path)
