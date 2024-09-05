@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>501</width>
-    <height>153</height>
+    <width>527</width>
+    <height>310</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,6 +58,35 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="xoffset_lbl">
+         <property name="text">
+          <string>X Offset:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="yoffset_lbl">
+         <property name="text">
+          <string>Y Offset:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="zoffset_lbl">
+         <property name="text">
+          <string>Z Offset:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0">
      <property name="topMargin">
       <number>0</number>
@@ -68,9 +97,6 @@
      <property name="verticalSpacing">
       <number>-1</number>
      </property>
-     <item row="3" column="2">
-      <widget class="QLineEdit" name="z_ledit"/>
-     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="y_lbl">
        <property name="text">
@@ -91,24 +117,12 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="2">
-      <widget class="QLineEdit" name="y_ledit"/>
-     </item>
-     <item row="3" column="4">
-      <widget class="QLineEdit" name="depth_ledit"/>
-     </item>
-     <item row="0" column="4">
-      <widget class="QLineEdit" name="width_ledit"/>
-     </item>
      <item row="0" column="3">
       <widget class="QLabel" name="width_lbl">
        <property name="text">
         <string>Width</string>
        </property>
       </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLineEdit" name="x_ledit"/>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="x_lbl">
@@ -137,8 +151,47 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="4">
+      <widget class="QDoubleSpinBox" name="width_dsb">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QDoubleSpinBox" name="z_dsb">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QDoubleSpinBox" name="y_dsb">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QDoubleSpinBox" name="x_dsb">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="4">
-      <widget class="QLineEdit" name="height_ledit"/>
+      <widget class="QDoubleSpinBox" name="height_dsb">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="4">
+      <widget class="QDoubleSpinBox" name="depth_dsb">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

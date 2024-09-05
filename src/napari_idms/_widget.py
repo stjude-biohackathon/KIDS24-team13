@@ -39,5 +39,4 @@ class Main_Widget(QWidget):
         self.tab_widget.addTab(ROI_Generator_widget(self.viewer,IDMS_Backend_object,IDMS_main_object), "ROI Generator")
         self.tab_widget.addTab(Segmentation_widget(self.viewer,IDMS_Backend_object,IDMS_main_object), "Segmentation/Annotation")
         """
-
-
+        
