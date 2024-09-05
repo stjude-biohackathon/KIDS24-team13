@@ -71,6 +71,6 @@ if __name__ == '__main__':
     print(f"Image Collections: {idms.get_image_collections('biohackathon', '2024', 'Microglia_Samples')}")
     print(
         f"Image Collection Details: {idms.get_image_collection_details('ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398')}")
-    print(f"Roi Boxes: {idms.get_roi_boxes('biohackathon', '2024', 'Microglia_Samples', 'B-T97L974C_s1')}")
+    print(f"Roi Boxes: {idms.get_roi_boxes('biohackathon', '2024', 'Microglia_Samples', 'Lu-T39ExB_s1')}")
     print(
         f"Roi Box Segmentations: {idms.get_roi_box_seg('biohackathon', '2024', 'Microglia_Samples', 'B-T97L974C_s1', 'box1')}")

@@ -12,6 +12,7 @@ class IDMS_main_widget(QWidget):
         super().__init__()
         self.viewer = viewer
         self.full_image = "Full Image"
+        self.roi_from_settings = "ROI from Advanced Settings"
 
         # Load the UI file - Main window
         script_dir = os.path.dirname(__file__)
@@ -105,14 +106,21 @@ class IDMS_main_widget(QWidget):
 
         # Get all rois for this owner and update projects list
         if self.ic_cbbox.currentText() != "":
-            roi_list = self.idms.get_roi_boxes(self.owner_cbbox.currentText(), self.project_cbbox.currentText(),
+            list_of_roi_dicts = self.idms.get_roi_boxes(self.owner_cbbox.currentText(), self.project_cbbox.currentText(),
                                                       self.group_cbbox.currentText(), self.ic_cbbox.currentText())
 
-            print("hi",roi_list)
 
-            roi_list = ["","1","2"]
+            # Do it if only roi list is not empty
+            roi_list = []
+            if list_of_roi_dicts:
+                for item in list_of_roi_dicts:
+                    if "boxName" in item:
+                        roi_list.append(item["boxName"])
 
-            self.roi_cbbox.set_items([""]+roi_list)
+                self.roi_cbbox.set_items([self.full_image, self.roi_from_settings]+roi_list)
+
+            else:
+                self.roi_cbbox.set_items([self.full_image, self.roi_from_settings])
 
 
     def roi_changed(self):

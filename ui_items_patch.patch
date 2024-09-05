@@ -1,0 +1,144 @@
+Subject: [PATCH] ui items patch
+---
+Index: src/napari_IDMS.egg-info/PKG-INFO
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/napari_IDMS.egg-info/PKG-INFO b/src/napari_IDMS.egg-info/PKG-INFO
+--- a/src/napari_IDMS.egg-info/PKG-INFO	(revision 7bb3563d494cd9bc4844173504af89b02dc355be)
++++ b/src/napari_IDMS.egg-info/PKG-INFO	(date 1725464800045)
+@@ -85,6 +85,17 @@
+     pip install napari-IDMS
+ 
+ 
++Install napari
++```
++python -m pip install "napari[all]"
++```
++
++Open napari by typing the command
++```Shell
++napari
++```
++
++
+ 
+ 
+ ## Contributing
+Index: src/napari_IDMS.egg-info/SOURCES.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/napari_IDMS.egg-info/SOURCES.txt b/src/napari_IDMS.egg-info/SOURCES.txt
+--- a/src/napari_IDMS.egg-info/SOURCES.txt	(revision 7bb3563d494cd9bc4844173504af89b02dc355be)
++++ b/src/napari_IDMS.egg-info/SOURCES.txt	(date 1725464800061)
+@@ -11,6 +11,7 @@
+ src/napari_idms/IDMS_main_widget.py
+ src/napari_idms/__init__.py
+ src/napari_idms/_widget.py
++src/napari_idms/_widget_backup.py
+ src/napari_idms/_writer.py
+ src/napari_idms/napari.yaml
+ src/napari_idms/roi_generator_widget.py
+Index: src/napari_idms/IDMS_main_widget.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/napari_idms/IDMS_main_widget.py b/src/napari_idms/IDMS_main_widget.py
+--- a/src/napari_idms/IDMS_main_widget.py	(revision 7bb3563d494cd9bc4844173504af89b02dc355be)
++++ b/src/napari_idms/IDMS_main_widget.py	(date 1725475264535)
+@@ -3,17 +3,70 @@
+ from qtpy import uic
+ from qtpy.QtCore import Qt
+ import sys
++from .checkable_combobox import CheckableComboBox
+ 
++# IDMS Main class
+ class IDMS_main_widget(QWidget):
+-    def __init__(self, viewer):
++    def __init__(self, viewer,idms_api=None,stand_alone=True):
+         # Initializing
+         super().__init__()
+         self.viewer = viewer
+         self.items = ["Item1","Item2","Item3"]
+ 
+-
+         # Load the UI file - Main window
+         script_dir = os.path.dirname(__file__)
+-        ui_file_name = "mock_IDMS_main.ui"
++        ui_file_name = "IDMS_main.ui"
+         abs_file_path = os.path.join(script_dir, '..', 'UI_files', ui_file_name)
+-        uic.loadUi(abs_file_path, self)
+\ No newline at end of file
++        uic.loadUi(abs_file_path, self)
++
++        # Get the dropdown boxes from ui file
++        self.owner_cbbox = self.findChild(QComboBox, "owner_cbbox")
++        self.project_cbbox = self.findChild(QComboBox, "project_cbbox")
++        self.group_cbbox = self.findChild(QComboBox, "group_cbbox")
++        self.ic_cbbox = self.findChild(QComboBox, "ic_cbbox")
++        self.roi_cbbox = self.findChild(QComboBox, "roi_cbbox")
++        self.seg_cbbox = self.findChild(QComboBox, "seg_cbbox")
++
++        # Get the layout boxes to add
++        self.roi_hbox = self.findChild(QHBoxLayout, "roi_hbox")
++        self.seg_hbox = self.findChild(QHBoxLayout, "seg_hbox")
++
++
++        # Add initial items to combobox inside the hboxes
++        self.roi_cbbox =  CheckableComboBox(self.items)
++        self.roi_hbox.addWidget(self.roi_cbbox)
++
++        self.seg_cbbox =  CheckableComboBox(self.items)
++        self.seg_hbox.addWidget(self.seg_cbbox)
++
++        # Trigger IDMS and populate one by one
++        self.IDMS_initialize()
++        self.IDMS_populate_interface()
++
++
++    # Function to add list of items to the combo box
++    def populate_combobox(self,combo_box,items):
++        combo_box.clear()  # Clear existing items
++        combo_box.addItems(items)  # Add new items from the list
++
++    # Function to Initialize IDMS
++    def IDMS_initialize(self):
++        print("Initializing IDMS")
++
++
++    # Function to populate initial items from IDMS
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
+Index: src/napari_idms/_widget.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/napari_idms/_widget.py b/src/napari_idms/_widget.py
+--- a/src/napari_idms/_widget.py	(revision 7bb3563d494cd9bc4844173504af89b02dc355be)
++++ b/src/napari_idms/_widget.py	(date 1725465771174)
+@@ -26,4 +26,5 @@
+         self.tab_widget = self.findChild(QTabWidget, "tab_widget")
+         self.tab_widget.addTab(IDMS_main_widget(self.viewer), "IDMS main")
+         self.tab_widget.addTab(ROI_Generator_widget(self.viewer), "ROI Generator")
+-        self.tab_widget.addTab(Segmentation_widget(self.viewer), "Segmentation/Annotation")
+\ No newline at end of file
++        self.tab_widget.addTab(Segmentation_widget(self.viewer), "Segmentation/Annotation")
++
