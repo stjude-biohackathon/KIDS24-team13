@@ -2,14 +2,16 @@ from qtpy.QtWidgets import QPushButton,QHBoxLayout, QWidget, QComboBox, QLabel, 
 import os
 from qtpy import uic
 from qtpy.QtCore import Qt
+from tifffile import imwrite
 
 class Segmentation_widget(QWidget):
-    def __init__(self, viewer, idms_api=None):
+    def __init__(self, viewer, idms_api=None, idms_main=None):
         # Initializing
         super().__init__()
         self.viewer = viewer
         
         self.idms_api = idms_api
+        self.idms_main = idms_main
 
         # Load the UI file - Main window
         script_dir = os.path.dirname(__file__)
@@ -42,8 +44,10 @@ class Segmentation_widget(QWidget):
         roi_layout.addWidget(self.label)
 
         self.roiComboBox = QComboBox()
-        items = ['a', 'b', 'c', 'd']
-        self.roiComboBox.addItems(items)
+        # items = ['a', 'b', 'c', 'd']
+        self.roi_items = set()
+        # items = self.idms_main.roi_cbbox.checked_items
+        # self.roiComboBox.addItems(items)
         roi_layout.addWidget(self.roiComboBox)
 
         layout.addLayout(roi_layout)
@@ -69,11 +73,21 @@ class Segmentation_widget(QWidget):
 
 
     def add_layer(self, event):
-        """Add a new layer to both combo box and checkboxes."""
+        """Add a new layer to both combo box and checkboxes."""        
+        roi_items = self.idms_main.roi_cbbox.checked_items
+        for roi in roi_items:
+            if roi not in self.roi_items:
+                self.roi_items.add(roi)
+                self.roiComboBox.addItem(roi)
+        
         new_layer = event.value
+        if new_layer.name in roi_items:
+            return
+        
         self.oldnames[new_layer] = new_layer.name
         new_layer.events.name.connect(self.on_namechange)
         self.add_layer_to_ui(new_layer)
+
 
     def add_layer_to_ui(self, layer):
         """Helper method to update the UI when a layer is added."""
@@ -96,6 +110,15 @@ class Segmentation_widget(QWidget):
             self.layerComboBox.setItemText(index, newname)
     
     def on_register_clicked(self):
+        print("hi")
+        print(self.idms_main.roi_cbbox.checked_items) 
+
+        #get roi checked items
+        checked_roi = self.roiComboBox.currentText()
+        print(f"Selected ROI: {checked_roi}")
+
+        roi_idms_id = self.idms_main.get_roi_id_for_roi_name(checked_roi)
+
         selected_layers = self.layerComboBox.get_checked_items()
         print(f"Registered layers: {selected_layers}")
 
@@ -117,17 +140,18 @@ class Segmentation_widget(QWidget):
                 print("Number of axes:", layer.data.ndim) 
                 # Determine the file path and save the data
                 out = "/Volumes/ctrbioimageinformatics/common/BioHackathon/2024/segmentation_data/"
-                file_name = f"{layer_name}.tiff"
+                file_name = f"{layer_name}.ome.tif"
                 save_path = out + file_name
                 
                 # Save the layer as a TIFF file
-                layer.save(save_path)
+                # layer.save(save_path)
+                imwrite(save_path, layer.data , metadata={'axes': 'ZYX'})
 
                 #send to IDMS
                 #send save_path, roi-id
                 jude_path = "/research/sharedresources/cbi/common/BioHackathon/2024/segmentation_data/" + file_name
                 #get this roi id from previous tab
-                roi_id = "roiB_404555ff39fe191c31a89cf"
+                roi_id = roi_idms_id
 
                 if self.idms_api:
                     response = self.idms_api.create_roi_box_seg(roi_id, jude_path)
