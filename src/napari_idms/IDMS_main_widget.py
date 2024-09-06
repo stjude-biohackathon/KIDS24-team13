@@ -296,11 +296,40 @@ class IDMS_main_widget(QWidget):
             self.roi_select_btn.setEnabled(True)
 
 
+    def roi_refresh(self):
+        # Get all rois for this owner and update projects list
+        if self.ic_cbbox.currentText() != "":
+            list_of_roi_dicts = self.idms.get_roi_boxes(self.owner_cbbox.currentText(), self.project_cbbox.currentText(),
+                                                      self.group_cbbox.currentText(), self.ic_cbbox.currentText())
+
+
+            # Do it if only roi list is not empty
+            self.roi_list = []
+            self.roi_ids = []
+            self.roi_info = []
+            if list_of_roi_dicts:
+                for item in list_of_roi_dicts:
+                    if "boxName" in item:
+                        self.roi_list.append(item["boxName"])
+                        self.roi_ids.append(item["boxId"])
+                        self.roi_info.append(item)
+
+                self.roi_cbbox.update_items(self.roi_list + [self.roi_from_settings])
+
+            else:
+                self.roi_cbbox.update_items([self.roi_from_settings])
+
+            self.roi_select_btn.setEnabled(True)
+
+
     def roi_selection(self):
         if not self.roi_cbbox.checkboxes:
             self.show_message("No ROIs available for the current selection")
             self.seg_select_btn.setEnabled(False)
             return
+
+        # Refresh ROI
+        self.roi_refresh()
 
         if self.roi_cbbox.exec_():
             # Trigger ROI changed
@@ -312,12 +341,31 @@ class IDMS_main_widget(QWidget):
             self.show_message("No Segmentations available for the current selection")
             return
 
+        # Refresh Segmentation change
+        self.seg_refresh()
+
         if self.seg_cbbox.exec_():
             print("")
 
+    def seg_refresh(self):
+        if self.roi_cbbox.checked_items:
+            # Get all segmentations for this owner and update projects list
+            seg_list_dict = self.idms.get_roi_box_seg(self.owner_cbbox.currentText(),self.project_cbbox.currentText(), self.group_cbbox.currentText(), self.ic_cbbox.currentText(),self.roi_cbbox.checked_items)
+
+            # Do it if only roi list is not empty
+            self.seg_list = []
+            self.seg_ids = []
+            self.seg_all_info = []
+            if seg_list_dict:
+                for item in seg_list_dict:
+                    self.seg_list.append(item["name"])
+                    self.seg_ids.append(item["segId"])
+                    self.seg_all_info.append(item)
+
+                self.seg_cbbox.update_items(self.seg_list)
 
     def roi_changed(self):
-        # Clear all other combo boxes in hierarchy - could be a deign pattern code later ?
+        # Clear all other combo boxes in hierarchy
         self.seg_cbbox.clear()
 
         if self.roi_cbbox.checked_items:

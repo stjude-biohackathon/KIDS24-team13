@@ -52,6 +52,19 @@ class CheckBoxPopup(QDialog):
 
         self.scroll_area_widget.adjustSize()
 
+    def update_items(self, items):
+        """Update the items without resetting the state of existing items."""
+        existing_items = [checkbox.text() for checkbox in self.checkboxes]
+
+        for item in items:
+            if item not in existing_items:
+                # Add the new item as a checkbox
+                checkbox = QCheckBox(item)
+                self.checkboxes.append(checkbox)
+                self.scroll_area_layout.addWidget(checkbox)
+
+        self.scroll_area_widget.adjustSize()
+
     def select_all(self):
         for checkbox in self.checkboxes:
             checkbox.setChecked(True)
