@@ -63,6 +63,7 @@ class RoiListWidget(QWidget):
         self.remove_callback = remove_callback  # Store the remove callback function
 
         ic_id = idms_main.get_current_ic_id()
+        # ic_id = "ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398"
         ic_details = idms_api.get_image_collection_details(ic_id)
         
         y_max = int(ic_details[0]['bounds']['maxY'])
@@ -130,6 +131,14 @@ class RoiListWidget(QWidget):
 
     def set_depth(self, depth):
         self.depth_dsb.setValue(depth)
+    
+    def update_info(self, roi_dict):
+        self.set_x(roi_dict['x'])
+        self.set_y(roi_dict['y'])
+        self.set_width(roi_dict['width'])
+        self.set_height(roi_dict['height'])
+        self.set_z(roi_dict['z'])
+        self.set_depth(roi_dict['depth'])
 
 
 class ROI_Generator_widget(QWidget):
@@ -155,8 +164,6 @@ class ROI_Generator_widget(QWidget):
         # Create a QListWidget
         self.list_widget = self.findChild(QListWidget, "roi_lw")
 
-        # Start from here for the dynamic UI elements
-
         # Example usage
         self.idms_register_btn = self.findChild(QPushButton, "register_btn")
         self.idms_register_btn.clicked.connect(self.register_with_IDMS)
@@ -176,6 +183,9 @@ class ROI_Generator_widget(QWidget):
             print("New shapes layer added by the user.")
     
     def on_shape_drawn(self, event):
+        shape_id = list(self.shapes_layer.selected_data)
+        if shape_id: # Get the selected id only if it exists
+            shape_id = int(shape_id[0])+1
         # Only focus on the most recently drawn shape
         if event.action == "added":
             # Get the last shape drawn
@@ -186,7 +196,6 @@ class ROI_Generator_widget(QWidget):
             if shape_int.shape[1] == 2:
                 shape_int = np.hstack([shape_int, np.zeros((shape_int.shape[0], 1), dtype=int)])
 
-            print(f"Shape: {shape_int}")
             # Calculate the starting point (x, y, z)
             start_point = shape_int[0]  # The first corner of the rectangle (x, y, z)
             # Calculate width (w), height (h), and depth (d) based on the difference between first and opposite corner
@@ -206,7 +215,6 @@ class ROI_Generator_widget(QWidget):
 
             # Create the ROI for the last drawn shape
             shape_id = len(self.shapes_layer.data)
-            print(f"Shape {shape_id}: {shape_info}")
             self.shapes_dict[f'Shape {shape_id}'] = shape_info
 
             # Pass the last shape info to create_roi
@@ -215,10 +223,6 @@ class ROI_Generator_widget(QWidget):
             # Map the shape_id to the widget_id
             self.shape_widget_map[shape_id] = widget_id
 
-            # print("Shapes Widget Map:", self.shape_widget_map)
-
-            # print(self.shapes_layer.current_properties)
-            # print(self.shapes_layer.unique_id)
             self.shape_id_map[shape_id] = self.shapes_layer.unique_id
 
             return shape_info, self.shapes_dict
@@ -226,7 +230,48 @@ class ROI_Generator_widget(QWidget):
         if event.action == "removed":
             self.remove_roi_item(self, widget_id)
 
+        if event.action == "changed":
+            self.on_shape_modified(shape_id-1)
+
         return self.shapes_dict
+
+    def on_shape_modified(self, shape_id):
+        """Handle modifications to existing shapes (like resize or move)."""
+        # Get the modified shape's index
+        shape = self.shapes_layer.data[shape_id]
+        shape_int = shape.astype(int)
+
+        # Handle both 2D and 3D cases (similar to on_shape_drawn)
+        if shape_int.shape[1] == 2:
+            shape_int = np.hstack([shape_int, np.zeros((shape_int.shape[0], 1), dtype=int)])
+
+        start_point = shape_int[0]
+        opposite_point = shape_int[2]
+
+        # Recalculate width, height, and depth based on the new coordinates
+        w = opposite_point[2] - start_point[2]
+        h = opposite_point[1] - start_point[1]
+        d = 1 if self.viewer.dims.ndim == 2 else opposite_point[0] - start_point[0]
+
+        # Update shape info
+        shape_info = {
+            "x": int(start_point[2]),
+            "y": int(start_point[1]),
+            "z": int(start_point[0]),
+            "width": int(w),
+            "height": int(h),
+            "depth": int(d)
+        }
+
+        # Update the dictionary with the new info
+        shape_id = shape_id + 1  # Shape IDs start at 1, not 0
+        self.shapes_dict[f'Shape {shape_id}'] = shape_info
+
+        # Also update the widget associated with this shape (if necessary)
+        widget = self.shape_widget_map.get(shape_id)
+        if widget:
+            widget.update_info(shape_info)
+
 
     def create_roi(self, id, shape_info) -> RoiListWidget:
 
@@ -289,7 +334,6 @@ class ROI_Generator_widget(QWidget):
                                             self.widget_list.get_depth(),
                                             ic_id)
             
-            # print("Box Id:", box_id)
             if box_id:
                 show_info_messagebox("Roi registered with IDMS!")
             else:
