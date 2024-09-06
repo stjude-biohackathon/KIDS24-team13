@@ -304,8 +304,8 @@ class IDMS_main_widget(QWidget):
 
         if self.roi_cbbox.exec_():
             # Trigger ROI changed
-            self.roi_changed()
             self.seg_select_btn.setEnabled(True)
+            self.roi_changed()
 
     def seg_selection(self):
         if not self.seg_cbbox.checkboxes:
@@ -320,7 +320,7 @@ class IDMS_main_widget(QWidget):
         # Clear all other combo boxes in hierarchy - could be a deign pattern code later ?
         self.seg_cbbox.clear()
 
-        if not self.roi_cbbox.checkboxes:
+        if self.roi_cbbox.checked_items:
             # Get all segmentations for this owner and update projects list
             seg_list_dict = self.idms.get_roi_box_seg(self.owner_cbbox.currentText(),self.project_cbbox.currentText(), self.group_cbbox.currentText(), self.ic_cbbox.currentText(),self.roi_cbbox.checked_items)
 
