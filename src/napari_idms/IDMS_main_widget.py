@@ -128,6 +128,10 @@ class IDMS_main_widget(QWidget):
             self.show_message("Selection required for Materialization")
             return
 
+        if not self.roi_cbbox.checked_items:
+            self.show_message("ROI Selection required for Materialization")
+            return
+
         self.status_progress.setValue(10)
         QApplication.processEvents()
 
