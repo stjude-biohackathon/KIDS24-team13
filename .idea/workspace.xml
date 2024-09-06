@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="03a3ed85-225d-4a58-8f00-c9da65f6731c" name="Changes" comment="IDMS main update - populate from IDMS + checkable combobox + data progress">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/UI_files/IDMS_main.ui" beforeDir="false" afterPath="$PROJECT_DIR$/src/UI_files/IDMS_main.ui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/napari_idms/IDMS_main_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/napari_idms/IDMS_main_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/napari_idms/checkable_combobox.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/napari_idms/checkable_combobox.py" afterDir="false" />
@@ -27,23 +28,23 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2lc2Q0XDrjcuSZp8RCThRhdGavG" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.idms_backend.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "idms__main",
-    "last_opened_file_path": "C:/Krishnan_Workspace/Projects/KIDS24_hackathon/Working_directory/KIDS24-team13"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.idms_backend.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;idms__main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Krishnan_Workspace/Projects/KIDS24_hackathon/Working_directory/KIDS24-team13&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
