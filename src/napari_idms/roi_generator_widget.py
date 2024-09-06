@@ -78,8 +78,7 @@ class RoiListWidget(QWidget):
 
         self.remove_callback = remove_callback  # Store the remove callback function
 
-        # ic_id = idms_main.get_current_ic_id()
-        ic_id = "ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398"
+        ic_id = idms_main.get_current_ic_id()
         ic_details = idms_api.get_image_collection_details(ic_id)
         
         y_max = int(ic_details[0]['bounds']['maxY'])
@@ -210,6 +209,7 @@ class ROI_Generator_widget(QWidget):
         if shape_id: # Get the selected id only if it exists
             shape_id = int(shape_id[0])+1
         # Only focus on the most recently drawn shape
+
         if event.action == "added":
             # Get the last shape drawn
             shape = self.shapes_layer.data[-1]
@@ -252,7 +252,8 @@ class ROI_Generator_widget(QWidget):
             return shape_info, self.shapes_dict
         
         if event.action == "removed":
-            self.remove_roi_item(self, widget_id)
+            widget_id = self.shape_widget_map[shape_id]
+            self.remove_roi_item(widget_id)
 
         if event.action == "changed":
             self.on_shape_modified(shape_id-1)
