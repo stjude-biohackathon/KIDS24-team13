@@ -3,6 +3,7 @@ import os
 from qtpy import uic
 from qtpy.QtCore import Qt
 from tifffile import imwrite
+import uuid
 
 class Segmentation_widget(QWidget):
     def __init__(self, viewer, idms_api=None, idms_main=None):
@@ -110,62 +111,88 @@ class Segmentation_widget(QWidget):
             self.layerComboBox.setItemText(index, newname)
     
     def on_register_clicked(self):
-        print("hi")
-        print(self.idms_main.roi_cbbox.checked_items) 
-
-        #get roi checked items
+        # Get the selected ROI
         checked_roi = self.roiComboBox.currentText()
         print(f"Selected ROI: {checked_roi}")
 
         roi_idms_id = self.idms_main.get_roi_id_for_roi_name(checked_roi)
 
+        # Get selected layers
         selected_layers = self.layerComboBox.get_checked_items()
         print(f"Registered layers: {selected_layers}")
 
-        # Save each selected layer
+        # Loop through the selected layers and save each
         for layer_name in selected_layers:
-            # Find the layer in the viewer by name
             layer = self.viewer.layers[layer_name]
 
-            # Check if the layer has data (such as an image or labels layer)
+            # Check if the layer has data
             if hasattr(layer, 'data'):
                 data = layer.data
                 shape = data.shape
 
-                #adding some prints to debug
-                print(f"Layer '{layer_name}' data as NumPy array:")
-                print(layer.data)
-                print(type(layer.data))
+                # Debug prints
                 print(layer.data.shape)
-                print("Number of axes:", layer.data.ndim) 
+                print("Number of axes:", layer.data.ndim)
+
                 # Determine the file path and save the data
                 if os.name == "posix":
                     out = "/Volumes/ctrbioimageinformatics/common/BioHackathon/2024/segmentation_data/"
                 else:
                     out = r"Z:\ResearchHome\SharedResources\CtrBioimageInformatics\common\BioHackathon\2024\segmentation_data\\"
-                file_name = f"{layer_name}.ome.tif"
+
+                unique_id = uuid.uuid4()
+                file_name = f"{layer_name}_{unique_id}.ome.tif"
+                # file_name = f"{layer_name}.ome.tif"
                 save_path = out + file_name
                 
                 # Save the layer as a TIFF file
-                # layer.save(save_path)
-                imwrite(save_path, layer.data , metadata={'axes': 'ZYX'})
+                try:
+                    imwrite(save_path, layer.data, metadata={'axes': 'ZYX'})
+                    saved = True
+                    print(f"Layer '{layer_name}' saved to {save_path}")
+                except Exception as e:
+                    saved = False
+                    print(f"Failed to save layer '{layer_name}': {e}")
 
-                #send to IDMS
-                #send save_path, roi-id
+                # Send the file path and ROI ID to IDMS
                 jude_path = "/research/sharedresources/cbi/common/BioHackathon/2024/segmentation_data/" + file_name
-                #get this roi id from previous tab
                 roi_id = roi_idms_id
 
-                if self.idms_api:
-                    response = self.idms_api.create_roi_box_seg(roi_id, jude_path)
-                    print(response)
+                if saved and self.idms_api:
+                    try:
+                        response = self.idms_api.create_roi_box_seg(roi_id, jude_path)
+                        print(response)
+                        sent = True
+                    except Exception as e:
+                        sent = False
+                        print(f"Failed to send to IDMS: {e}")
                 else:
-                    print("failed to send to IDMS")
+                    sent = False
+                    print("Failed to send to IDMS or save path")
 
+                # Show a dialog popup with success/failure message
+                msg = QMessageBox()
+                msg.setWindowTitle("Layer Registration Status")
 
-                print(f"Layer '{layer_name}' saved to {save_path}")
+                if saved and sent:
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setText(f"Layer '{layer_name}' saved and sent to IDMS successfully!")
+                elif saved and not sent:
+                    msg.setIcon(QMessageBox.Warning)
+                    msg.setText(f"Layer '{layer_name}' saved to {save_path} but failed to send to IDMS.")
+                else:
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText(f"Failed to save layer '{layer_name}' and send to IDMS.")
+                
+                msg.exec_()
+
             else:
                 print(f"Layer '{layer_name}' does not have accessible data as a NumPy array.")
+                msg = QMessageBox()
+                msg.setWindowTitle("Layer Registration Status")
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText(f"Layer '{layer_name}' does not have accessible data.")
+                msg.exec_()
 
 class CheckableComboBox(QComboBox):
     def __init__(self, items, parent=None):
