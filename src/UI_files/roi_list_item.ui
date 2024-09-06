@@ -58,35 +58,6 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QLabel" name="xoffset_lbl">
-         <property name="text">
-          <string>X Offset:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="yoffset_lbl">
-         <property name="text">
-          <string>Y Offset:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="zoffset_lbl">
-         <property name="text">
-          <string>Z Offset:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0">
      <property name="topMargin">
       <number>0</number>
