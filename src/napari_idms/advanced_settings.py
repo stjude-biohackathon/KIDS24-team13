@@ -63,15 +63,6 @@ class Adv_Settings_FormWidget(QWidget):
 
     def submit_form(self):
         # Store the values from textboxes into backend variables
-        self.x_val = int(self.x_input.text())
-        self.y_val = int(self.y_input.text())
-        self.z_val = int(self.z_input.text())
-        self.width_val = int(self.width_input.text())
-        self.height_val = int(self.height_input.text())
-        self.depth_val = int(self.depth_input.text())
-
-        # Output updated values (you can remove or modify this part as needed)
-        print(f"Updated Values - x: {self.x_val}, y: {self.y_val}, z: {self.z_val}, "
-              f"width: {self.width_val}, height: {self.height_val}, depth: {self.depth_val}")
+        # Backend variables will be directly pulled in IDMS main class
 
         self.close()

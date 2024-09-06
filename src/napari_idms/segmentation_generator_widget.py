@@ -139,7 +139,10 @@ class Segmentation_widget(QWidget):
                 print(layer.data.shape)
                 print("Number of axes:", layer.data.ndim) 
                 # Determine the file path and save the data
-                out = "/Volumes/ctrbioimageinformatics/common/BioHackathon/2024/segmentation_data/"
+                if os.name == "posix":
+                    out = "/Volumes/ctrbioimageinformatics/common/BioHackathon/2024/segmentation_data/"
+                else:
+                    out = r"Z:\ResearchHome\SharedResources\CtrBioimageInformatics\common\BioHackathon\2024\segmentation_data\\"
                 file_name = f"{layer_name}.ome.tif"
                 save_path = out + file_name
                 
@@ -186,7 +189,7 @@ class CheckableComboBox(QComboBox):
         index = self.findText(item)
         if index >= 0:
             self.removeItem(index)
-
+    
     def on_item_changed(self):
         checked_items = self.get_checked_items()
         print("Checked items:", checked_items)
@@ -197,3 +200,4 @@ class CheckableComboBox(QComboBox):
             if self.model().item(i).checkState() == Qt.Checked:
                 checked_items.append(self.model().item(i).text())
         return checked_items
+        
