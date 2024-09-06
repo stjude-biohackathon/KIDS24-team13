@@ -46,7 +46,7 @@ class MockWidget(QWidget):
         super().__init__()
         self.viewer = viewer
         # Initialize the IDMS API that auto-refreshes the token
-        self.idms_api = IdmsAPI(username="INSERT_STJUDE_USERNAME", password="INSERT_STJUDE_PASSWORD", endpoint="INSERT_IDMS_API_ENDPOINT)
+        self.idms_api = IdmsAPI(username="INSERT_STJUDE_USERNAME", password="INSERT_STJUDE_PASSWORD", endpoint="INSERT_IDMS_API_ENDPOINT")
 
         # Initialize the IDMS API that uses a static token that expires in a week. No auto-refresh
         self.idms_api = IdmsAPI(endpoint="http://idms.stjude.org:8888/idms/api",

@@ -1,11 +1,12 @@
-from qtpy.QtWidgets import QHBoxLayout, QPushButton, QWidget, QComboBox, QProgressBar, QWidget, QVBoxLayout, QListWidget
+from qtpy.QtWidgets import QHBoxLayout, QPushButton, QWidget, QComboBox, QProgressBar, QWidget, QVBoxLayout, QListWidget, QMessageBox
 import os
 from qtpy import uic
 from qtpy.QtCore import Qt
 import sys
-from .checkable_combobox import CheckableComboBox
+from .checkable_combobox import CheckableComboBox, CheckBoxPopup
 from .advanced_settings import Adv_Settings_FormWidget
 from qtpy.QtWidgets import QApplication
+import numpy as np
 
 # IDMS Main class
 class IDMS_main_widget(QWidget):
@@ -50,18 +51,18 @@ class IDMS_main_widget(QWidget):
         self.group_cbbox = self.findChild(QComboBox, "group_cbbox")
         self.ic_cbbox = self.findChild(QComboBox, "ic_cbbox")
 
+        # Get ROI and Segmentation buttons
+        self.roi_select_btn = self.findChild(QPushButton, "roi_select_btn")
+        self.seg_select_btn = self.findChild(QPushButton, "seg_select_btn")
 
-        # Get the layout boxes to add
-        self.roi_hbox = self.findChild(QHBoxLayout, "roi_hbox")
-        self.seg_hbox = self.findChild(QHBoxLayout, "seg_hbox")
+        self.roi_select_btn.clicked.connect(self.roi_selection)
+        self.seg_select_btn.clicked.connect(self.seg_selection)
 
+        self.roi_select_btn.setEnabled(False)
+        self.seg_select_btn.setEnabled(False)
 
-        # Add initial items to combobox inside the hboxes
-        self.roi_cbbox =  CheckableComboBox()
-        self.roi_hbox.addWidget(self.roi_cbbox)
-
-        self.seg_cbbox =  CheckableComboBox()
-        self.seg_hbox.addWidget(self.seg_cbbox)
+        self.roi_cbbox = CheckBoxPopup()
+        self.seg_cbbox = CheckBoxPopup()
 
         # Trigger IDMS
         self.idms = idms_api
@@ -75,13 +76,17 @@ class IDMS_main_widget(QWidget):
         self.project_cbbox.currentIndexChanged.connect(self.project_changed)
         self.group_cbbox.currentIndexChanged.connect(self.group_changed)
         self.ic_cbbox.currentIndexChanged.connect(self.ic_changed)
-        self.roi_cbbox.model().itemChanged.connect(self.roi_changed)
-        #self.seg_cbbox.currentIndexChanged.connect(self.segmentation_changed)
+        #self.roi_cbbox.model().itemChanged.connect(self.roi_changed) # ROI changed will be trigger inside roi selection function
+
 
     # Function to load meta data
     def load_metadata(self):
         # Clear the QListWidget first (optional)
         self.meta_ls.clear()
+
+        if self.ic_cbbox.currentText() == "":
+            self.show_message("Selection required for fetching metadata")
+            return
 
         # Get data from IDMS
         current_ic_id = self.get_current_ic_id()
@@ -119,6 +124,13 @@ class IDMS_main_widget(QWidget):
 
     def load_data_from_IDMS(self):
         print("Materializing from IDMS")
+        if self.ic_cbbox.currentText() == "":
+            self.show_message("Selection required for Materialization")
+            return
+
+        if not self.roi_cbbox.checked_items:
+            self.show_message("ROI Selection required for Materialization")
+            return
 
         self.status_progress.setValue(10)
         QApplication.processEvents()
@@ -138,7 +150,13 @@ class IDMS_main_widget(QWidget):
             self.adv_settings.depth_val = int(
                 self.adv_settings.depth_input.text()) if self.adv_settings.depth_input.text() != "" else (self.get_specific_meta("SIZEZ"))
 
-            self.viewer.add_image(self.idms.get_array_from_box_coordinate(self.adv_settings.x_val, self.adv_settings.y_val, self.adv_settings.z_val, self.adv_settings.width_val, self.adv_settings.height_val, self.adv_settings.depth_val, self.get_current_ic_id()),name="ROI_from_Advanced_Settings")#,translate=(self.adv_settings.z_val,self.adv_settings.x_val,self.adv_settings.y_val))
+            data = self.idms.get_array_from_box_coordinate(self.adv_settings.x_val, self.adv_settings.y_val, self.adv_settings.z_val, self.adv_settings.width_val, self.adv_settings.height_val, self.adv_settings.depth_val, self.get_current_ic_id())
+            offset = (self.adv_settings.z_val,self.adv_settings.y_val,self.adv_settings.x_val)
+            if data.ndim == 2:
+                data = np.expand_dims(data,axis=0)
+
+            # Add the data to viewer
+            self.viewer.add_image(data,name=self.roi_from_settings,translate=offset)
 
         self.status_progress.setValue(30)
 
@@ -150,7 +168,10 @@ class IDMS_main_widget(QWidget):
 
             current_roi_id = self.get_roi_id_for_roi_name(roi_to_pull)
             x_offset,y_offset,z_offset = self.get_roi_offset_for_roi_name(roi_to_pull)
-            self.viewer.add_image(self.idms.get_array_from_box_id(current_roi_id),name=roi_to_pull,translate=(z_offset,x_offset,y_offset))
+            data = self.idms.get_array_from_box_id(current_roi_id)
+            if data.ndim == 2:
+                data = np.expand_dims(data,axis=0)
+            self.viewer.add_image(data,name=roi_to_pull,translate=(z_offset,y_offset,x_offset))
 
             # Update progress bar based on the nth roi
             progress_value = int(30 + (((len(self.roi_cbbox.checked_items)-2 + i) / (len(self.roi_cbbox.checked_items))) * 30))
@@ -161,20 +182,23 @@ class IDMS_main_widget(QWidget):
         for i,seg_to_pull in enumerate(self.seg_cbbox.checked_items):
             current_seg_id = self.get_seg_id_for_seg_name(seg_to_pull)
             x_offset, y_offset, z_offset = self.get_seg_offset_for_seg_name(seg_to_pull)
-            self.viewer.add_labels(self.idms.get_array_from_seg_id(current_seg_id),name=seg_to_pull,translate=(z_offset,x_offset,y_offset))
+            data = self.idms.get_array_from_seg_id(current_seg_id)
+            if data.ndim == 2:
+                data = np.expand_dims(data,axis=0)
+            self.viewer.add_labels(data ,name=seg_to_pull,translate=(z_offset,y_offset,x_offset))
 
             # Update progress bar based on the nth roi
             progress_value = int(60 + (((len(self.seg_cbbox.checked_items)+ i) / (len(self.seg_cbbox.checked_items))) * 38))
             self.status_progress.setValue(progress_value)
 
-
-
         self.status_progress.setValue(100)
 
 
     def load_adv_settings(self):
-        print("Open advanced settings")
-        self.adv_settings.show()
+        if self.ic_cbbox.currentText() != "":
+            self.adv_settings.show()
+        else:
+            self.show_message("Valid Image Collection needed")
 
 
     def clear_all_items(self):
@@ -187,6 +211,10 @@ class IDMS_main_widget(QWidget):
         self.meta_ls.clear()
 
         self.populate_combobox(self.owner_cbbox, [""] + self.idms.get_owners())  # Owner populated
+        self.status_progress.setValue(0)
+
+        self.roi_select_btn.setEnabled(False)
+        self.seg_select_btn.setEnabled(False)
 
 
     # Function to add list of items to the combo box
@@ -239,6 +267,8 @@ class IDMS_main_widget(QWidget):
         # Clear all other combo boxes in hierarchy - could be a deign pattern code later ?
         self.roi_cbbox.clear()
         self.seg_cbbox.clear()
+        self.roi_select_btn.setEnabled(False)
+        self.seg_select_btn.setEnabled(False)
 
 
         # Get all rois for this owner and update projects list
@@ -258,31 +288,102 @@ class IDMS_main_widget(QWidget):
                         self.roi_ids.append(item["boxId"])
                         self.roi_info.append(item)
 
-                self.roi_cbbox.set_items(self.roi_list + [self.roi_from_settings])
+                self.roi_cbbox.populate_items(self.roi_list + [self.roi_from_settings])
 
             else:
-                self.roi_cbbox.set_items([self.roi_from_settings])
+                self.roi_cbbox.populate_items([self.roi_from_settings])
 
+            self.roi_select_btn.setEnabled(True)
+
+
+    def roi_refresh(self):
+        # Get all rois for this owner and update projects list
+        if self.ic_cbbox.currentText() != "":
+            list_of_roi_dicts = self.idms.get_roi_boxes(self.owner_cbbox.currentText(), self.project_cbbox.currentText(),
+                                                      self.group_cbbox.currentText(), self.ic_cbbox.currentText())
+
+
+            # Do it if only roi list is not empty
+            self.roi_list = []
+            self.roi_ids = []
+            self.roi_info = []
+            if list_of_roi_dicts:
+                for item in list_of_roi_dicts:
+                    if "boxName" in item:
+                        self.roi_list.append(item["boxName"])
+                        self.roi_ids.append(item["boxId"])
+                        self.roi_info.append(item)
+
+                self.roi_cbbox.update_items(self.roi_list + [self.roi_from_settings])
+
+            else:
+                self.roi_cbbox.update_items([self.roi_from_settings])
+
+            self.roi_select_btn.setEnabled(True)
+
+
+    def roi_selection(self):
+        if not self.roi_cbbox.checkboxes:
+            self.show_message("No ROIs available for the current selection")
+            self.seg_select_btn.setEnabled(False)
+            return
+
+        # Refresh ROI
+        self.roi_refresh()
+
+        if self.roi_cbbox.exec_():
+            # Trigger ROI changed
+            self.seg_select_btn.setEnabled(True)
+            self.roi_changed()
+
+    def seg_selection(self):
+        if not self.seg_cbbox.checkboxes:
+            self.show_message("No Segmentations available for the current selection")
+            return
+
+        # Refresh Segmentation change
+        self.seg_refresh()
+
+        if self.seg_cbbox.exec_():
+            print("")
+
+    def seg_refresh(self):
+        if self.roi_cbbox.checked_items:
+            # Get all segmentations for this owner and update projects list
+            seg_list_dict = self.idms.get_roi_box_seg(self.owner_cbbox.currentText(),self.project_cbbox.currentText(), self.group_cbbox.currentText(), self.ic_cbbox.currentText(),self.roi_cbbox.checked_items)
+
+            # Do it if only roi list is not empty
+            self.seg_list = []
+            self.seg_ids = []
+            self.seg_all_info = []
+            if seg_list_dict:
+                for item in seg_list_dict:
+                    self.seg_list.append(item["name"])
+                    self.seg_ids.append(item["segId"])
+                    self.seg_all_info.append(item)
+
+                self.seg_cbbox.update_items(self.seg_list)
 
     def roi_changed(self):
-        # Clear all other combo boxes in hierarchy - could be a deign pattern code later ?
+        # Clear all other combo boxes in hierarchy
         self.seg_cbbox.clear()
 
-        # Get all segmentations for this owner and update projects list
-        seg_list_dict = self.idms.get_roi_box_seg(self.owner_cbbox.currentText(),self.project_cbbox.currentText(), self.group_cbbox.currentText(), self.ic_cbbox.currentText(),self.roi_cbbox.checked_items)
+        if self.roi_cbbox.checked_items:
+            # Get all segmentations for this owner and update projects list
+            seg_list_dict = self.idms.get_roi_box_seg(self.owner_cbbox.currentText(),self.project_cbbox.currentText(), self.group_cbbox.currentText(), self.ic_cbbox.currentText(),self.roi_cbbox.checked_items)
 
 
-        # Do it if only roi list is not empty
-        self.seg_list = []
-        self.seg_ids = []
-        self.seg_all_info = []
-        if seg_list_dict:
-            for item in seg_list_dict:
-                self.seg_list.append(item["name"])
-                self.seg_ids.append(item["segId"])
-                self.seg_all_info.append(item)
+            # Do it if only roi list is not empty
+            self.seg_list = []
+            self.seg_ids = []
+            self.seg_all_info = []
+            if seg_list_dict:
+                for item in seg_list_dict:
+                    self.seg_list.append(item["name"])
+                    self.seg_ids.append(item["segId"])
+                    self.seg_all_info.append(item)
 
-            self.seg_cbbox.set_items(self.seg_list)
+                self.seg_cbbox.populate_items(self.seg_list)
 
 
     def get_current_ic_id(self):
@@ -304,7 +405,6 @@ class IDMS_main_widget(QWidget):
 
 
     def get_roi_offset_for_roi_name(self,roi_name):
-        print("Get offset")
         query = roi_name
         if query in self.roi_list:
             index = self.roi_list.index(query)
@@ -333,3 +433,12 @@ class IDMS_main_widget(QWidget):
             return self.seg_ids[index]
         else:
             return None  # Or handle this case as needed
+
+    def show_message(self, message):
+        """Show a pop-up message with an OK button."""
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setText(message)
+        msg_box.setWindowTitle("Message")
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.exec_()  # Show the message box
