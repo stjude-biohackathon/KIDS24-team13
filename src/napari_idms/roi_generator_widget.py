@@ -5,6 +5,22 @@ from qtpy import uic
 import sys
 import numpy as np
 
+def show_warning_messagebox(message): 
+    msg = QMessageBox() 
+    msg.setIcon(QMessageBox.Warning) 
+  
+    # setting message for Message Box 
+    msg.setText(message) 
+      
+    # setting Message box window title 
+    msg.setWindowTitle("Warning MessageBox") 
+      
+    # declaring buttons on Message Box 
+    msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel) 
+      
+    # start the app 
+    retval = msg.exec_() 
+  
 
 def show_info_messagebox(message): 
     msg = QMessageBox() 
@@ -62,8 +78,8 @@ class RoiListWidget(QWidget):
 
         self.remove_callback = remove_callback  # Store the remove callback function
 
-        ic_id = idms_main.get_current_ic_id()
-        # ic_id = "ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398"
+        # ic_id = idms_main.get_current_ic_id()
+        ic_id = "ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398"
         ic_details = idms_api.get_image_collection_details(ic_id)
         
         y_max = int(ic_details[0]['bounds']['maxY'])
@@ -172,6 +188,13 @@ class ROI_Generator_widget(QWidget):
 
         # Registering with IDMS
 
+    def highlight_shape(self, shape_id):
+        # Highlight the shape in the napari viewer
+        self.shapes_layer.selected_data = [shape_id]
+
+    def unhighlight_shape(self, shape_id):
+        # Unhighlight the shape in the napari viewer
+        self.shapes_layer.selected_data = []
 
     def on_layer_added(self, event):
         """Check if a new shapes layer has been added."""
@@ -192,6 +215,7 @@ class ROI_Generator_widget(QWidget):
             shape = self.shapes_layer.data[-1]
             shape_int = shape.astype(int)
 
+            #TODO: Make it always 3d even in 2D
             # If there are only two coordinates (x, y), set z to 0 by default
             if shape_int.shape[1] == 2:
                 shape_int = np.hstack([shape_int, np.zeros((shape_int.shape[0], 1), dtype=int)])
@@ -296,7 +320,7 @@ class ROI_Generator_widget(QWidget):
         list_item = self.widget_list_map[widget]  # Get the QListWidgetItem associated with the widget
         row = self.list_widget.row(list_item)  # Get the row of the list item
         self.list_widget.takeItem(row)  # Remove the item from the QListWidget
-        widget.deleteLater()  # Delete the widget from memory
+       
 
         # Optionally remove the corresponding shape from the dictionary
         shape_id = int(widget.roi_lbl.text())
@@ -305,9 +329,11 @@ class ROI_Generator_widget(QWidget):
             del self.shapes_dict[f'Shape {shape_id}']
             
             # self.shapes_layer.remove(shape_id-1) #TODO Have to make layer selection dynamic
-            self.shapes_layer.data.pop(shape_id)
+            # self.shapes_layer.data.pop(shape_id)
             # print(self.shapes_layer.data)
             del self.shape_id_map[shape_id]
+
+        widget.deleteLater()  # Delete the widget from memory
 
         print(f"Removed shape {shape_id}. Current shapes:", self.shapes_dict)
 
