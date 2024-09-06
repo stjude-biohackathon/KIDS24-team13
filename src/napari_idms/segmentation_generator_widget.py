@@ -139,7 +139,11 @@ class Segmentation_widget(QWidget):
                 print(layer.data.shape)
                 print("Number of axes:", layer.data.ndim) 
                 # Determine the file path and save the data
-                out = "/Volumes/ctrbioimageinformatics/common/BioHackathon/2024/segmentation_data/"
+                if os.name == "posix":
+                    out = "/Volumes/ctrbioimageinformatics/common/BioHackathon/2024/segmentation_data/"
+                else:
+                    out = "Z:\ResearchHome\SharedResources\CtrBioimageInformatics\common\BioHackathon\2024\segmentation_data"
+ 
                 file_name = f"{layer_name}.ome.tif"
                 save_path = out + file_name
                 
