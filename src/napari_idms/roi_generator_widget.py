@@ -40,7 +40,7 @@ def show_critical_messagebox(message):
 
 
 class RoiListWidget(QWidget):
-    def __init__(self, header, roi_dict, idms_api, parent=None, remove_callback=None):
+    def __init__(self, header, roi_dict, idms_api, idms_main, parent=None, remove_callback=None):
         super().__init__(parent)
 
         # Load the UI file - Main window
@@ -62,8 +62,9 @@ class RoiListWidget(QWidget):
 
         self.remove_callback = remove_callback  # Store the remove callback function
 
-
-        ic_details = idms_api.get_image_collection_details('ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398')
+        ic_id = idms_main.get_current_ic_id()
+        ic_details = idms_api.get_image_collection_details(ic_id)
+        
         y_max = int(ic_details[0]['bounds']['maxY'])
         x_max = int(ic_details[0]['bounds']['maxX'])
         z_max = int(ic_details[0]['bounds']['maxZ'])
@@ -138,10 +139,12 @@ class ROI_Generator_widget(QWidget):
         self.viewer = viewer
         self.idms_api = idms_api
         self.widget_list1 = None
+        self.idms_main = idms_main
         # Initialize shapes_dict as an instance attribute
         self.shapes_dict = {}
         self.shape_widget_map = {}
         self.widget_list_map = {}
+        self.shape_id_map = {}
 
         # Load the UI file - Main window
         script_dir = os.path.dirname(__file__)
@@ -183,18 +186,19 @@ class ROI_Generator_widget(QWidget):
             if shape_int.shape[1] == 2:
                 shape_int = np.hstack([shape_int, np.zeros((shape_int.shape[0], 1), dtype=int)])
 
+            print(f"Shape: {shape_int}")
             # Calculate the starting point (x, y, z)
             start_point = shape_int[0]  # The first corner of the rectangle (x, y, z)
             # Calculate width (w), height (h), and depth (d) based on the difference between first and opposite corner
             opposite_point = shape_int[2]  # The opposite corner of the rectangle
-            w = opposite_point[1] - start_point[1]
-            h = opposite_point[0] - start_point[0]
-            d = 1 if self.viewer.dims.ndim == 2 else opposite_point[2] - start_point[2]
+            w = opposite_point[2] - start_point[2]
+            h = opposite_point[1] - start_point[1]
+            d = 1 if self.viewer.dims.ndim == 2 else opposite_point[0] - start_point[0]
 
             shape_info = {
-                "x": int(start_point[1]),
-                "y": int(start_point[0]),
-                "z": int(start_point[2]),
+                "x": int(start_point[2]),
+                "y": int(start_point[1]),
+                "z": int(start_point[0]),
                 "width": int(w),
                 "height": int(h),
                 "depth": int(d)
@@ -211,56 +215,23 @@ class ROI_Generator_widget(QWidget):
             # Map the shape_id to the widget_id
             self.shape_widget_map[shape_id] = widget_id
 
-            print("Shapes Widget Map:", self.shape_widget_map)
+            # print("Shapes Widget Map:", self.shape_widget_map)
+
+            # print(self.shapes_layer.current_properties)
+            # print(self.shapes_layer.unique_id)
+            self.shape_id_map[shape_id] = self.shapes_layer.unique_id
 
             return shape_info, self.shapes_dict
+        
+        if event.action == "removed":
+            self.remove_roi_item(self, widget_id)
 
-        # if len(self.shapes_layer.data) > 0:
-        #     # Get the last shape drawn
-        #     shape = self.shapes_layer.data[-1]
-        #     shape_int = shape.astype(int)
-
-        #     # If there are only two coordinates (x, y), set z to 0 by default
-        #     if shape_int.shape[1] == 2:
-        #         shape_int = np.hstack([shape_int, np.zeros((shape_int.shape[0], 1), dtype=int)])
-
-        #     # Calculate the starting point (x, y, z)
-        #     start_point = shape_int[0]  # The first corner of the rectangle (x, y, z)
-        #     # Calculate width (w), height (h), and depth (d) based on the difference between first and opposite corner
-        #     opposite_point = shape_int[2]  # The opposite corner of the rectangle
-        #     w = opposite_point[1] - start_point[1]
-        #     h = opposite_point[0] - start_point[0]
-        #     d = 1 if self.viewer.dims.ndim == 2 else opposite_point[2] - start_point[2]
-
-        #     shape_info = {
-        #         "x": int(start_point[1]),
-        #         "y": int(start_point[0]),
-        #         "z": int(start_point[2]),
-        #         "width": int(w),
-        #         "height": int(h),
-        #         "depth": int(d)
-        #     }
-
-        #     # Create the ROI for the last drawn shape
-        #     shape_id = len(self.shapes_layer.data)
-        #     print(f"Shape {shape_id}: {shape_info}")
-        #     self.shapes_dict[f'Shape {shape_id}'] = shape_info
-
-        #     # Pass the last shape info to create_roi
-        #     widget_id= self.create_roi(shape_id, shape_info)
-
-        #     # Map the shape_id to the widget_id
-        #     self.shape_widget_map[shape_id] = widget_id
-
-        #     print("Shapes Widget Map:", self.shape_widget_map)
-
-        #     return shape_info, self.shapes_dict
         return self.shapes_dict
 
     def create_roi(self, id, shape_info) -> RoiListWidget:
 
         # Create the custom widget
-        custom_widget = RoiListWidget(str(id), shape_info, self.idms_api, remove_callback=self.remove_roi_item)
+        custom_widget = RoiListWidget(str(id), shape_info, self.idms_api, self.idms_main, remove_callback=self.remove_roi_item)
 
         # Wrap the custom widget in a QListWidgetItem
         list_item = QListWidgetItem()
@@ -287,31 +258,36 @@ class ROI_Generator_widget(QWidget):
         if shape_id in self.shape_widget_map:
             del self.shape_widget_map[shape_id]
             del self.shapes_dict[f'Shape {shape_id}']
+            
+            # self.shapes_layer.remove(shape_id-1) #TODO Have to make layer selection dynamic
+            self.shapes_layer.data.pop(shape_id)
+            # print(self.shapes_layer.data)
+            del self.shape_id_map[shape_id]
 
         print(f"Removed shape {shape_id}. Current shapes:", self.shapes_dict)
 
-    def register_with_IDMS(self, image_collection_id, idms_api=None):
+    def register_with_IDMS(self, ic_id, idms_api=None):
 
         idms_api = self.idms_api
-        self.widget_list1 = self.shape_widget_map[1]
+        self.widget_list = self.shape_widget_map[1]
         
         if not idms_api:
             show_critical_messagebox("IDMS API not found!")
 
             return
 
-        image_collection_id = 'ic_3422f10e2b0bf10e2b0b6e80ccd6ffffffff1725371996398'
+        ic_id = self.idms_main.get_current_ic_id()
 
         # Add check for z dimension
         try:
 
-            box_id = idms_api.create_roi_box(self.widget_list1.get_x(),
-                                    self.widget_list1.get_y(),
-                                    self.widget_list1.get_z(),
-                                        self.widget_list1.get_width(),
-                                        self.widget_list1.get_height(),
-                                            self.widget_list1.get_depth(),
-                                            image_collection_id)
+            box_id = idms_api.create_roi_box(self.widget_list.get_x(),
+                                    self.widget_list.get_y(),
+                                    self.widget_list.get_z(),
+                                        self.widget_list.get_width(),
+                                        self.widget_list.get_height(),
+                                            self.widget_list.get_depth(),
+                                            ic_id)
             
             # print("Box Id:", box_id)
             if box_id:
