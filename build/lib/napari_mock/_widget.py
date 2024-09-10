@@ -4,11 +4,6 @@ from qtpy.QtWidgets import QHBoxLayout, QPushButton, QWidget, QComboBox, QLabel,
 import os
 from qtpy import uic
 from qtpy.QtCore import Qt
-import sys
-sys.path.append('/Volumes/ctrbioimageinformatics/common/BioHackathon/2024/pyidms/plugins')
-from common.idms_api import IdmsAPI
-from common.owner import Owner
-from common.project import Project
 
 if TYPE_CHECKING:
     import napari
@@ -45,17 +40,8 @@ class MockWidget(QWidget):
         # Initializing
         super().__init__()
         self.viewer = viewer
-        # Initialize the IDMS API that auto-refreshes the token
-        self.idms_api = IdmsAPI(username="INSERT_STJUDE_USERNAME", password="INSERT_STJUDE_PASSWORD", endpoint="INSERT_IDMS_API_ENDPOINT")
-
-        # Initialize the IDMS API that uses a static token that expires in a week. No auto-refresh
-        self.idms_api = IdmsAPI(endpoint="http://idms.stjude.org:8888/idms/api",
-                                token="INSERT_IDMS_API_TOKEN")
-        print(self.idms_api.health())
-
-        self.owner_api = Owner(self.idms_api)
-        self.project_api = Project(self.idms_api)
         self.items = ["Item1","Item2","Item3"]
+
         # Load the UI file - Main window
         script_dir = os.path.dirname(__file__)
         ui_file_name = "mockup.ui"
@@ -80,7 +66,7 @@ class MockWidget(QWidget):
         self.ic = self.findChild(QComboBox, "ic_cbbox")
         self.roi = self.findChild(QComboBox, "roi_cbbox")
 
-        self.populate_combobox(self.owner, [owners['owner'] for owners in self.owner_api.search()])
+        self.populate_combobox(self.owner,self.items)
         self.populate_combobox(self.project, self.items)
         self.populate_combobox(self.group, self.items)
         self.populate_combobox(self.ic, self.items)
